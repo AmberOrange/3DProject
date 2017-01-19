@@ -2,6 +2,11 @@
 
 #include "System.hpp"
 
+struct transformers
+{
+	int destroyedHumans;
+};
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	System system;
