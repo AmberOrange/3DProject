@@ -156,3 +156,41 @@ void Model::RenderBuffers(ID3D11DeviceContext* deviceContext)
 
 	return;
 }
+
+bool Model::LoadMaterial(string fileName, vector<MaterialType> &mList)
+{
+	ifstream file;
+	string sInput, special;
+	istringstream iStream;
+	MaterialType curMat;
+
+	file.open(fileName);
+	if (file.fail() == true)
+		return false;
+
+	//file.get(cInput);
+	while (getline(file, sInput))
+	{
+		iStream.str(sInput);
+		if (sInput.substr(0, 2) == "Ka")
+		{
+			iStream >> special >>
+				curMat.ambient.x >> curMat.ambient.y >> curMat.ambient.z;
+		}
+		else if(sInput.substr(0, 2) == "Kd")
+		{
+			iStream >> special >>
+				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
+		}
+		else if (sInput.substr(0, 2) == "Ks")
+		{
+			iStream >> special >>
+				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
+		}
+	}
+}
+
+bool Model::LoadTextureFromFile(string fileName)
+{
+	return false;
+}
