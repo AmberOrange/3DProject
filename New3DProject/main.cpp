@@ -7,6 +7,12 @@ struct transformers
 	int destroyedHumans;
 };
 
+struct harrypotter
+{
+	int eheheeee;
+	char expectoPatronum;
+};
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	System system;
