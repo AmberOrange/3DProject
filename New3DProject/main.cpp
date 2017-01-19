@@ -2,6 +2,8 @@
 
 #include "System.hpp"
 
+// This is a comment! =D
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	System system;
