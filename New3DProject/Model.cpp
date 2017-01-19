@@ -42,6 +42,106 @@ int Model::GetIndexCount()
 	return m_indexCount;
 }
 
+bool Model::loadDataStructures(string fileName, vector<XMFLOAT3> &vertices, vector<XMFLOAT2> &texcoords, vector<XMFLOAT3> &normals, vector<Face> &faces, bool rightHanded = false)
+{
+	ifstream file(fileName);
+	string line, special;
+	char input;
+	istringstream inputString;
+
+	XMFLOAT3 vtx;
+	XMFLOAT2 tcd;
+	Face fcs;
+
+	file.open(fileName);
+	if (file.fail())
+		return false;
+
+	// Read from file and continue to read until
+	// the end of file is reached.
+	while (getline(file, line))
+	{
+		inputString.str(line);
+
+		// Read in the vertices.
+		if (line.substr(0, 2) == "v ")
+		{
+			inputString >> special >>
+				vtx.x >> vtx.y >> vtx.z;
+			if (rightHanded)
+			{
+				// Invert the Z vertex to change to right hand system.
+				vtx.z = vtx.z * (-1.0f);
+			}
+			vertices.vertices.push_back(vtx);
+		}
+
+		// Read in the texture uv coordinates.
+		else if (line.substr(0, 2) == "vt")
+		{
+			inputString >> special >>
+				tcd.x >> tcd.y;
+			if (rightHanded)
+			{
+				// Invert the V texture coordinates to left hand system.
+				tcd.y = 1.0f - tcd.y;
+			}
+			texcoords.push_back(tcd);
+		}
+
+		// Read in the normals.
+		else if (line.substr(0, 2) == "vn")
+		{
+			inputString >> special >>
+				vtx.x >> vtx.y >> vtx.z;
+			if (rightHanded)
+			{
+				// Invert the Z normal to change to left hand system.
+				vtx.z = vtx.z * (-1.0f);
+			}
+			normals.push_back(vtx);
+		}
+
+		// Read in the faces.
+		else if (line.substr(0, 2) == "f ")
+		{
+			if (!rightHanded)
+			{
+				inputString >> special;
+				inputString >>
+					fcs.vIndex1 >> input >>
+					fcs.tIndex1 >> input >>
+					fcs.nIndex1;
+				inputString >>
+					fcs.vIndex2 >> input >>
+					fcs.tIndex2 >> input >>
+					fcs.nIndex2;
+				inputString >>
+					fcs.vIndex3 >> input >>
+					fcs.tIndex3 >> input >>
+					fcs.nIndex3;
+			}
+			else
+			{
+				inputString >> special;
+				inputString >>
+					fcs.vIndex3 >> input >>
+					fcs.tIndex3 >> input >>
+					fcs.nIndex3;
+				inputString >>
+					fcs.vIndex2 >> input >>
+					fcs.tIndex2 >> input >>
+					fcs.nIndex2;
+				inputString >>
+					fcs.vIndex1 >> input >>
+					fcs.tIndex1 >> input >>
+					fcs.nIndex1;
+			}
+		}
+	}
+	file.close();
+}
+
 bool Model::InitializeBuffers(ID3D11Device* device)
 {
 	VertexType* vertices;
@@ -131,6 +231,78 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 
 	delete[] indices;
 	indices = 0;
+
+	return true;
+}
+
+bool Model::InitializeBuffersNEW(ID3D11Device* device)
+{
+	vector<XMFLOAT3>* vertices;
+	vector<XMFLOAT2>* texcoords;
+	vector<XMFLOAT3>* normals;
+	vector<Face>* faces;
+
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+	HRESULT result;
+
+	vertices = new vector<XMFLOAT3>;
+	texcoords = new vector<XMFLOAT2>;
+	normals = new vector<XMFLOAT3>;
+	faces = new vector<Face>;
+
+	loadDataStructures("test.obj", *vertices, *texcoords, *normals, *faces);
+
+	// Set the number of vertices in the vertex array.
+	m_vertexCount = vertices->size();
+
+	// Set the number of indices in the index array.
+	m_indexCount = 3;
+
+	// Set up the description of the static vertex buffer.
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(XMFLOAT3) * m_vertexCount; // May check sizeof
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the vertex data.
+	vertexData.pSysMem = vertices;
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+
+	// Now create the vertex buffer.
+	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Set up the description of the static index buffer.
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(Face) * m_indexCount;
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+	indexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the index data.
+	indexData.pSysMem = faces;
+	indexData.SysMemPitch = 0;
+	indexData.SysMemSlicePitch = 0;
+
+	// Create the index buffer.
+	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Release the arrays now that the vertex and index buffers have been created and loaded.
+	delete vertices;
+
+	delete faces;
 
 	return true;
 }

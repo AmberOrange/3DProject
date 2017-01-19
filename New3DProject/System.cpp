@@ -104,7 +104,6 @@ void System::Run()
 				done = true;
 			}
 		}
-
 	}
 
 	return;
