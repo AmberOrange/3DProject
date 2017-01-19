@@ -2,6 +2,12 @@
 
 #include "System.hpp"
 
+struct harrypotter
+{
+	int eheheeee;
+	char expectoPatronum;
+};
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	System system;
