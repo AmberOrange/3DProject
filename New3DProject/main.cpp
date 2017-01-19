@@ -2,7 +2,7 @@
 
 #include "System.hpp"
 #include <iostream> // Macke
-#include <math.h> // Macke
+#include <math2.h> // Macke
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
