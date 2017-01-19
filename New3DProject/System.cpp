@@ -36,7 +36,8 @@ bool System::Initialize()
 	bool result;
 
 
-	// Initialize the width and height of the screen to zero before sending the variables into the function.
+	// Initialize the width and height of the screen to
+	// zero before sending the variables into the function.
 	screenWidth = 0;
 	screenHeight = 0;
 

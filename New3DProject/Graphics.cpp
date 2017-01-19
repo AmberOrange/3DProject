@@ -33,7 +33,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	if (!m_ColorShader.Initialize(m_Direct3D.GetDevice(), hwnd))
+	if (!m_Shader.Initialize(m_Direct3D.GetDevice(), hwnd))
 	{
 		MessageBox(hwnd, L"Could not initialize the shader object.", L"Error", MB_OK);
 		return false;
@@ -77,7 +77,7 @@ bool Graphics::Render()
 	m_Model.Render(m_Direct3D.GetDeviceContext());
 
 	// Render the model using the color shader.
-	result = m_ColorShader.Render(m_Direct3D.GetDeviceContext(), m_Model.GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	result = m_Shader.Render(m_Direct3D.GetDeviceContext(), m_Model.GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 	{
 		return false;

@@ -1,6 +1,7 @@
 #include <Windows.h>
 
 #include "System.hpp"
+#include <iostream> // Macke
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
