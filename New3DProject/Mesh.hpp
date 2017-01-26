@@ -3,5 +3,6 @@
 
 class Mesh : public Object
 {
-
+public:
+	
 };
