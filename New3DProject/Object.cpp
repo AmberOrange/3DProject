@@ -10,9 +10,34 @@ bool Object::loadObj(wstring filename)
 	vector<XMFLOAT2> vTC;
 	vector<XMFLOAT3> vNor;
 
+	// Indices to the temporary vectors.
 	vector<UINT> vPosIndex;
 	vector<UINT> vTCIndex;
 	vector<UINT> vNorIndex;
+
+	// Defines if obj file stores texture coordinates and/or normals.
+	bool hasTC = false;
+	bool harNorm = false;
+
+	// Additional variables used when reading from obj file.
+	char checkChar;
+	bool loop = true;
+
+	fileIn.open(filename, ifstream::in);
+
+	if (fileIn.is_open())
+	{
+		while (loop)
+		{
+			checkChar = fileIn.get();
+
+			switch (checkChar)
+			{
+				// To be continued...
+			}
+
+		}
+	}
 }
 
 bool Object::createBuffer(ID3D11Device* device)
