@@ -7,6 +7,11 @@
 #include <sstream>
 #include <vector>
 
+ID3D11Buffer* meshVertBuff;
+ID3D11Buffer* meshIndexBuff;
+//XMMATRIX meshWorld;
+int meshSubsets = 0;
+
 using namespace DirectX;
 using namespace std;
 
@@ -16,19 +21,24 @@ struct Face
 	int tIndex1, tIndex2, tIndex3;
 	int nIndex1, nIndex2, nIndex3;
 };
-class Model
+class ObjectHandler
 {
 public:
-	Model();
-	Model(const Model &);
-	~Model();
+	ObjectHandler();
+	ObjectHandler(const ObjectHandler &);
+	~ObjectHandler();
 
 	bool Initialize(ID3D11Device*);
 	void Render(ID3D11DeviceContext*);
 
 	int GetIndexCount();
 
-	bool loadDataStructures(string fileName, vector<XMFLOAT3> &vertices, vector<XMFLOAT2> &texcoords, vector<XMFLOAT3> &normals, vector<Face> &faces, bool rightHanded = false);
+	bool LoadObjModel(string fileName,
+		vector<XMFLOAT3> &vertices,
+		vector<XMFLOAT2> &texcoords,
+		vector<XMFLOAT3> &normals,
+		vector<Face> &faces,
+		bool rightHanded = false);
 
 private:
 	struct VertexType

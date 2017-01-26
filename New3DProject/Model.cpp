@@ -1,16 +1,16 @@
 #include "Model.hpp"
 
-Model::Model()
+ObjectHandler::ObjectHandler()
 {
 	m_vertexBuffer = nullptr;
 	m_indexBuffer = nullptr;
 }
 
-Model::Model(const Model &)
+ObjectHandler::ObjectHandler(const ObjectHandler &)
 {
 }
 
-Model::~Model()
+ObjectHandler::~ObjectHandler()
 {
 	// Release the index buffer.
 	if (m_indexBuffer)
@@ -27,22 +27,22 @@ Model::~Model()
 	}
 }
 
-bool Model::Initialize(ID3D11Device *device)
+bool ObjectHandler::Initialize(ID3D11Device *device)
 {
 	return InitializeBuffers(device);
 }
 
-void Model::Render(ID3D11DeviceContext *deviceContext)
+void ObjectHandler::Render(ID3D11DeviceContext *deviceContext)
 {
 	RenderBuffers(deviceContext);
 }
 
-int Model::GetIndexCount()
+int ObjectHandler::GetIndexCount()
 {
 	return m_indexCount;
 }
 
-bool Model::loadDataStructures(string fileName, vector<XMFLOAT3> &vertices, vector<XMFLOAT2> &texcoords, vector<XMFLOAT3> &normals, vector<Face> &faces, bool rightHanded = false)
+bool ObjectHandler::LoadObjModel(string fileName, vector<XMFLOAT3> &vertices, vector<XMFLOAT2> &texcoords, vector<XMFLOAT3> &normals, vector<Face> &faces, bool rightHanded = false)
 {
 	ifstream file(fileName);
 	string line, special;
@@ -142,7 +142,7 @@ bool Model::loadDataStructures(string fileName, vector<XMFLOAT3> &vertices, vect
 	file.close();
 }
 
-bool Model::InitializeBuffers(ID3D11Device* device)
+bool ObjectHandler::InitializeBuffers(ID3D11Device* device)
 {
 	VertexType* vertices;
 	unsigned long* indices;
@@ -235,7 +235,7 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 	return true;
 }
 
-bool Model::InitializeBuffersNEW(ID3D11Device* device)
+bool ObjectHandler::InitializeBuffersNEW(ID3D11Device* device)
 {
 	vector<XMFLOAT3>* vertices;
 	vector<XMFLOAT2>* texcoords;
@@ -251,7 +251,7 @@ bool Model::InitializeBuffersNEW(ID3D11Device* device)
 	normals = new vector<XMFLOAT3>;
 	faces = new vector<Face>;
 
-	loadDataStructures("test.obj", *vertices, *texcoords, *normals, *faces);
+	LoadObjModel("test.obj", *vertices, *texcoords, *normals, *faces);
 
 	// Set the number of vertices in the vertex array.
 	m_vertexCount = vertices->size();
@@ -307,7 +307,7 @@ bool Model::InitializeBuffersNEW(ID3D11Device* device)
 	return true;
 }
 
-void Model::RenderBuffers(ID3D11DeviceContext* deviceContext)
+void ObjectHandler::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
 	unsigned int stride;
 	unsigned int offset;
@@ -329,7 +329,7 @@ void Model::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
-bool Model::LoadMaterial(string fileName, vector<MaterialType> &mList)
+bool ObjectHandler::LoadMaterial(string fileName, vector<MaterialType> &mList)
 {
 	ifstream file;
 	string sInput, special;
@@ -362,7 +362,7 @@ bool Model::LoadMaterial(string fileName, vector<MaterialType> &mList)
 	}
 }
 
-bool Model::LoadTextureFromFile(string fileName)
+bool ObjectHandler::LoadTextureFromFile(string fileName)
 {
 	return false;
 }
