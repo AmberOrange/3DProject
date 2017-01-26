@@ -85,10 +85,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="default_vertex.hlsl">
+    <FxCompile Include="gbuffer_vertex.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="default_pixel.hlsl">
+    <FxCompile Include="gbuffer_pixel.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>
