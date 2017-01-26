@@ -5,7 +5,7 @@
 
 #include "D3D.hpp"
 #include "Camera.hpp"
-#include "Model.hpp"
+#include "ObjectHandler.hpp"
 #include "Shader.hpp"
 #include "DInput.hpp"
 
@@ -28,7 +28,7 @@ private:
 	bool Render();
 	D3D m_Direct3D;
 	Camera m_Camera;
-	Model m_Model;
+	ObjectHandler m_Model;
 	Shader m_Shader;
 
 };

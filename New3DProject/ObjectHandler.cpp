@@ -42,105 +42,10 @@ int ObjectHandler::GetIndexCount()
 	return m_indexCount;
 }
 
-bool ObjectHandler::LoadObjModel(string fileName, vector<XMFLOAT3> &vertices, vector<XMFLOAT2> &texcoords, vector<XMFLOAT3> &normals, vector<Face> &faces, bool rightHanded = false)
-{
-	ifstream file(fileName);
-	string line, special;
-	char input;
-	istringstream inputString;
-
-	XMFLOAT3 vtx;
-	XMFLOAT2 tcd;
-	Face fcs;
-
-	file.open(fileName);
-	if (file.fail())
-		return false;
-
-	// Read from file and continue to read until
-	// the end of file is reached.
-	while (getline(file, line))
-	{
-		inputString.str(line);
-
-		// Read in the vertices.
-		if (line.substr(0, 2) == "v ")
-		{
-			inputString >> special >>
-				vtx.x >> vtx.y >> vtx.z;
-			if (rightHanded)
-			{
-				// Invert the Z vertex to change to right hand system.
-				vtx.z = vtx.z * (-1.0f);
-			}
-			vertices.vertices.push_back(vtx);
-		}
-
-		// Read in the texture uv coordinates.
-		else if (line.substr(0, 2) == "vt")
-		{
-			inputString >> special >>
-				tcd.x >> tcd.y;
-			if (rightHanded)
-			{
-				// Invert the V texture coordinates to left hand system.
-				tcd.y = 1.0f - tcd.y;
-			}
-			texcoords.push_back(tcd);
-		}
-
-		// Read in the normals.
-		else if (line.substr(0, 2) == "vn")
-		{
-			inputString >> special >>
-				vtx.x >> vtx.y >> vtx.z;
-			if (rightHanded)
-			{
-				// Invert the Z normal to change to left hand system.
-				vtx.z = vtx.z * (-1.0f);
-			}
-			normals.push_back(vtx);
-		}
-
-		// Read in the faces.
-		else if (line.substr(0, 2) == "f ")
-		{
-			if (!rightHanded)
-			{
-				inputString >> special;
-				inputString >>
-					fcs.vIndex1 >> input >>
-					fcs.tIndex1 >> input >>
-					fcs.nIndex1;
-				inputString >>
-					fcs.vIndex2 >> input >>
-					fcs.tIndex2 >> input >>
-					fcs.nIndex2;
-				inputString >>
-					fcs.vIndex3 >> input >>
-					fcs.tIndex3 >> input >>
-					fcs.nIndex3;
-			}
-			else
-			{
-				inputString >> special;
-				inputString >>
-					fcs.vIndex3 >> input >>
-					fcs.tIndex3 >> input >>
-					fcs.nIndex3;
-				inputString >>
-					fcs.vIndex2 >> input >>
-					fcs.tIndex2 >> input >>
-					fcs.nIndex2;
-				inputString >>
-					fcs.vIndex1 >> input >>
-					fcs.tIndex1 >> input >>
-					fcs.nIndex1;
-			}
-		}
-	}
-	file.close();
-}
+//bool ObjectHandler::LoadObjModel(string fileName, vector<XMFLOAT3> &vertices, vector<XMFLOAT2> &texcoords, vector<XMFLOAT3> &normals, vector<Face> &faces, bool rightHanded = false)
+//{
+//
+//}
 
 bool ObjectHandler::InitializeBuffers(ID3D11Device* device)
 {
@@ -235,6 +140,28 @@ bool ObjectHandler::InitializeBuffers(ID3D11Device* device)
 	return true;
 }
 
+void ObjectHandler::RenderBuffers(ID3D11DeviceContext* deviceContext)
+{
+	unsigned int stride;
+	unsigned int offset;
+
+
+	// Set vertex buffer stride and offset.
+	stride = sizeof(VertexType);
+	offset = 0;
+
+	// Set the vertex buffer to active in the input assembler so it can be rendered.
+	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+
+	// Set the index buffer to active in the input assembler so it can be rendered.
+	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	return;
+}
+
 bool ObjectHandler::InitializeBuffersNEW(ID3D11Device* device)
 {
 	vector<XMFLOAT3>* vertices;
@@ -251,7 +178,7 @@ bool ObjectHandler::InitializeBuffersNEW(ID3D11Device* device)
 	normals = new vector<XMFLOAT3>;
 	faces = new vector<Face>;
 
-	LoadObjModel("test.obj", *vertices, *texcoords, *normals, *faces);
+	//LoadObjModel("test.obj", *vertices, *texcoords, *normals, *faces);
 
 	// Set the number of vertices in the vertex array.
 	m_vertexCount = vertices->size();
@@ -307,62 +234,40 @@ bool ObjectHandler::InitializeBuffersNEW(ID3D11Device* device)
 	return true;
 }
 
-void ObjectHandler::RenderBuffers(ID3D11DeviceContext* deviceContext)
-{
-	unsigned int stride;
-	unsigned int offset;
+//bool ObjectHandler::LoadMaterial(string fileName, vector<MaterialType> &mList)
+//{
+//	ifstream file;
+//	string sInput, special;
+//	istringstream iStream;
+//	MaterialType curMat;
+//
+//	file.open(fileName);
+//	if (file.fail() == true)
+//		return false;
+//
+//	//file.get(cInput);
+//	while (getline(file, sInput))
+//	{
+//		iStream.str(sInput);
+//		if (sInput.substr(0, 2) == "Ka")
+//		{
+//			iStream >> special >>
+//				curMat.ambient.x >> curMat.ambient.y >> curMat.ambient.z;
+//		}
+//		else if(sInput.substr(0, 2) == "Kd")
+//		{
+//			iStream >> special >>
+//				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
+//		}
+//		else if (sInput.substr(0, 2) == "Ks")
+//		{
+//			iStream >> special >>
+//				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
+//		}
+//	}
+//}
 
-
-	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType);
-	offset = 0;
-
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
-
-	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-	return;
-}
-
-bool ObjectHandler::LoadMaterial(string fileName, vector<MaterialType> &mList)
-{
-	ifstream file;
-	string sInput, special;
-	istringstream iStream;
-	MaterialType curMat;
-
-	file.open(fileName);
-	if (file.fail() == true)
-		return false;
-
-	//file.get(cInput);
-	while (getline(file, sInput))
-	{
-		iStream.str(sInput);
-		if (sInput.substr(0, 2) == "Ka")
-		{
-			iStream >> special >>
-				curMat.ambient.x >> curMat.ambient.y >> curMat.ambient.z;
-		}
-		else if(sInput.substr(0, 2) == "Kd")
-		{
-			iStream >> special >>
-				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
-		}
-		else if (sInput.substr(0, 2) == "Ks")
-		{
-			iStream >> special >>
-				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
-		}
-	}
-}
-
-bool ObjectHandler::LoadTextureFromFile(string fileName)
-{
-	return false;
-}
+//bool ObjectHandler::LoadTextureFromFile(string fileName)
+//{
+//	return false;
+//}

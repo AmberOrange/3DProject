@@ -7,20 +7,9 @@
 #include <sstream>
 #include <vector>
 
-ID3D11Buffer* meshVertBuff;
-ID3D11Buffer* meshIndexBuff;
-//XMMATRIX meshWorld;
-int meshSubsets = 0;
-
 using namespace DirectX;
 using namespace std;
 
-struct Face
-{
-	int vIndex1, vIndex2, vIndex3;
-	int tIndex1, tIndex2, tIndex3;
-	int nIndex1, nIndex2, nIndex3;
-};
 class ObjectHandler
 {
 public:
@@ -29,18 +18,18 @@ public:
 	~ObjectHandler();
 
 	bool Initialize(ID3D11Device*);
-	void Draw(ID3D11DeviceContext*);
+	void Render(ID3D11DeviceContext*);
 
 	int GetIndexCount();
 
-	bool LoadObjModel(string fileName,
-		// m_vertexBuff
-		// m_indexBuff
-		vector<XMFLOAT3> &vertices,
-		vector<XMFLOAT2> &texcoords,
-		vector<XMFLOAT3> &normals,
-		vector<Face> &faces,
-		bool rightHanded = false);
+	//bool LoadObjModel(string fileName,
+	//	// m_vertexBuff
+	//	// m_indexBuff
+	//	vector<XMFLOAT3> &vertices,
+	//	vector<XMFLOAT2> &texcoords,
+	//	vector<XMFLOAT3> &normals,
+	//	vector<Face> &faces,
+	//	bool rightHanded = false);
 
 private:
 	struct VertexType
@@ -66,8 +55,8 @@ private:
 	bool InitializeBuffersNEW(ID3D11Device*);
 	void RenderBuffers(ID3D11DeviceContext*);
 
-	bool LoadMaterial(string fileName, vector<MaterialType> &materialList);
-	bool LoadTextureFromFile(string fileName);
+	//bool LoadMaterial(string fileName, vector<MaterialType> &materialList);
+	//bool LoadTextureFromFile(string fileName);
 };
 
 #endif /* ObjectHandler_HPP */
