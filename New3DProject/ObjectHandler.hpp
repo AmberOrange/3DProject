@@ -29,11 +29,13 @@ public:
 	~ObjectHandler();
 
 	bool Initialize(ID3D11Device*);
-	void Render(ID3D11DeviceContext*);
+	void Draw(ID3D11DeviceContext*);
 
 	int GetIndexCount();
 
 	bool LoadObjModel(string fileName,
+		// m_vertexBuff
+		// m_indexBuff
 		vector<XMFLOAT3> &vertices,
 		vector<XMFLOAT2> &texcoords,
 		vector<XMFLOAT3> &normals,
@@ -68,4 +70,4 @@ private:
 	bool LoadTextureFromFile(string fileName);
 };
 
-#endif /* MODEL_HPP */
+#endif /* ObjectHandler_HPP */
