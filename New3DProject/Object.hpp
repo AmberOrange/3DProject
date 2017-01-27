@@ -4,6 +4,7 @@
 #include <d3d11.h>
 #include <xstring>
 #include <DirectXMath.h>
+#include <sstream>
 
 
 using namespace DirectX;
@@ -30,7 +31,7 @@ public:
 	Object();
 	~Object();
 
-	bool loadObj(wstring filename);
+	bool loadObj(wstring filename, bool RHCoordSys = false);
 	bool createBuffer(ID3D11Device* device);
 	bool render(ID3D11DeviceContext* deviceContext);
 
