@@ -11,6 +11,6 @@ struct PS_IN
 
 float4 PS_main(PS_IN input) : SV_TARGET
 {
-	//return shaderTexture.Sample(sampleState,input.Tex);
-	return float4(normalize(input.Nor),1.f);
+	return shaderTexture.Sample(sampleState,input.Tex);
+	//return float4(normalize(input.WPos),1.0f);
 }

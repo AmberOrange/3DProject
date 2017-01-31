@@ -625,7 +625,7 @@ void DShader::EmptyBuffers(ID3D11DeviceContext * deviceContext)
 	{
 		deviceContext->ClearRenderTargetView(m_gRTV[i], color);
 	}
-	float bcolor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+	float bcolor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	deviceContext->ClearRenderTargetView(m_renderTargetView, bcolor);
 	deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }

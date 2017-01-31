@@ -100,12 +100,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="gbuffer_vertex.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="gbuffer_pixel.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
     <FxCompile Include="gshader_vertex.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
