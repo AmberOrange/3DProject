@@ -68,8 +68,6 @@ bool Shader::InitializeShader(ID3D11Device* device, HWND hwnd)
 {
 	HRESULT result;
 	ID3DBlob* errorMessage;
-	ID3DBlob* vertexShaderBuffer;
-	ID3DBlob* pixelShaderBuffer;
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDesc;

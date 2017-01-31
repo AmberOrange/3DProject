@@ -34,7 +34,7 @@ private:
 	ID3D11InputLayout* m_layout;
 	ID3D11Buffer* m_matrixBuffer;
 
-	bool InitializeShader(ID3D11Device*, HWND, WCHAR*, WCHAR*);
+	bool InitializeShader(ID3D11Device*, HWND);
 	void OutputShaderErrorMessage(ID3DBlob*, HWND, WCHAR*);
 
 	bool SetConstantBuffer(ID3D11DeviceContext*, XMMATRIX &, XMMATRIX &, XMMATRIX &);

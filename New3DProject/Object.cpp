@@ -158,7 +158,10 @@ bool Object::loadObj(wstring filename, bool RHCoordSys)
 										tempInt--; // Obj start index from 1, we want to start from 0.
 										vPosIndex.push_back(tempInt);
 									}
-									else if(facePart == 1)
+									else if (facePart == 1)
+									{
+
+									}
 								}
 							}
 						}
@@ -170,6 +173,7 @@ bool Object::loadObj(wstring filename, bool RHCoordSys)
 
 		}
 	}
+	return true;
 }
 
 bool Object::createBuffer(ID3D11Device* device)
@@ -221,4 +225,6 @@ bool Object::render(ID3D11DeviceContext* deviceContext)
 
 	// Draw
 	deviceContext->Draw(nrOfVertices, 0);
+
+	return true;
 }
