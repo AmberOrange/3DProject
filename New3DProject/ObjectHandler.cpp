@@ -274,6 +274,28 @@ bool ObjectHandler::InitializeBuffers(ID3D11Device* device)
 	return true;
 }
 
+void ObjectHandler::RenderBuffers(ID3D11DeviceContext* deviceContext)
+{
+	unsigned int stride;
+	unsigned int offset;
+
+
+	// Set vertex buffer stride and offset.
+	stride = sizeof(VertexType);
+	offset = 0;
+
+	// Set the vertex buffer to active in the input assembler so it can be rendered.
+	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+
+	// Set the index buffer to active in the input assembler so it can be rendered.
+	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	return;
+}
+
 bool ObjectHandler::InitializeBuffersNEW(ID3D11Device* device)
 {
 	vector<XMFLOAT3>* vertices;
@@ -290,7 +312,7 @@ bool ObjectHandler::InitializeBuffersNEW(ID3D11Device* device)
 	normals = new vector<XMFLOAT3>;
 	faces = new vector<Face>;
 
-	LoadObjModel("test.obj", *vertices, *texcoords, *normals, *faces);
+	//LoadObjModel("test.obj", *vertices, *texcoords, *normals, *faces);
 
 	// Set the number of vertices in the vertex array.
 	m_vertexCount = vertices->size();
@@ -346,62 +368,40 @@ bool ObjectHandler::InitializeBuffersNEW(ID3D11Device* device)
 	return true;
 }
 
-void ObjectHandler::RenderBuffers(ID3D11DeviceContext* deviceContext)
-{
-	unsigned int stride;
-	unsigned int offset;
+//bool ObjectHandler::LoadMaterial(string fileName, vector<MaterialType> &mList)
+//{
+//	ifstream file;
+//	string sInput, special;
+//	istringstream iStream;
+//	MaterialType curMat;
+//
+//	file.open(fileName);
+//	if (file.fail() == true)
+//		return false;
+//
+//	//file.get(cInput);
+//	while (getline(file, sInput))
+//	{
+//		iStream.str(sInput);
+//		if (sInput.substr(0, 2) == "Ka")
+//		{
+//			iStream >> special >>
+//				curMat.ambient.x >> curMat.ambient.y >> curMat.ambient.z;
+//		}
+//		else if(sInput.substr(0, 2) == "Kd")
+//		{
+//			iStream >> special >>
+//				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
+//		}
+//		else if (sInput.substr(0, 2) == "Ks")
+//		{
+//			iStream >> special >>
+//				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
+//		}
+//	}
+//}
 
-
-	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType);
-	offset = 0;
-
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
-
-	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-	return;
-}
-
-bool ObjectHandler::LoadMaterial(string fileName, vector<MaterialType> &mList)
-{
-	ifstream file;
-	string sInput, special;
-	istringstream iStream;
-	MaterialType curMat;
-
-	file.open(fileName);
-	if (file.fail() == true)
-		return false;
-
-	//file.get(cInput);
-	while (getline(file, sInput))
-	{
-		iStream.str(sInput);
-		if (sInput.substr(0, 2) == "Ka")
-		{
-			iStream >> special >>
-				curMat.ambient.x >> curMat.ambient.y >> curMat.ambient.z;
-		}
-		else if(sInput.substr(0, 2) == "Kd")
-		{
-			iStream >> special >>
-				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
-		}
-		else if (sInput.substr(0, 2) == "Ks")
-		{
-			iStream >> special >>
-				curMat.diffuse.x >> curMat.diffuse.y >> curMat.diffuse.z;
-		}
-	}
-}
-
-bool ObjectHandler::LoadTextureFromFile(string fileName)
-{
-	return false;
-}
+//bool ObjectHandler::LoadTextureFromFile(string fileName)
+//{
+//	return false;
+//}

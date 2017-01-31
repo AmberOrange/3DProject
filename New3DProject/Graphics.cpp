@@ -2,7 +2,7 @@
 
 Graphics::Graphics()
 {
-	//m_Direct3D = nullptr;
+
 }
 
 Graphics::Graphics(const Graphics & m_graphics)
@@ -82,7 +82,6 @@ bool Graphics::Render()
 {
 	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	//bool result;
-
 	// Clear the buffers to begin the scene.
 	//m_Direct3D.BeginScene(0.1f, 0.1f, 0.1f, 1.0f);
 

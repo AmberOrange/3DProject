@@ -2,8 +2,8 @@
 
 Shader::Shader()
 {
-	m_vertexShader = nullptr;
-	m_pixelShader = nullptr;
+	m_gbuffer_vertex = nullptr;
+	m_gbuffer_pixel = nullptr;
 	m_layout = nullptr;
 	m_matrixBuffer = nullptr;
 }
@@ -29,45 +29,42 @@ Shader::~Shader()
 	}
 
 	// Release the pixel shader.
-	if (m_pixelShader)
+	if (m_gbuffer_pixel)
 	{
-		m_pixelShader->Release();
-		m_pixelShader = 0;
+		m_gbuffer_pixel->Release();
+		m_gbuffer_pixel = 0;
 	}
 
 	// Release the vertex shader.
-	if (m_vertexShader)
+	if (m_gbuffer_vertex)
 	{
-		m_vertexShader->Release();
-		m_vertexShader = 0;
+		m_gbuffer_vertex->Release();
+		m_gbuffer_vertex = 0;
 	}
 }
 
 bool Shader::Initialize(ID3D11Device *device, HWND hwnd)
 {
 	// Initialize the vertex and pixel shaders.
-	return InitializeShader(device, hwnd, L"default_vertex.hlsl", L"default_pixel.hlsl");
+	return InitializeShader(device, hwnd);
 }
 
-bool Shader::Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix)
+bool Shader::Frame(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix)
 {
 	bool result;
 
 
 	// Set the shader parameters that it will use for rendering.
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
+	result = SetConstantBuffer(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 	{
 		return false;
 	}
 
-	// Now render the prepared buffers with the shader.
-	RenderShader(deviceContext, indexCount);
-
 	return true;
 }
 
-bool Shader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool Shader::InitializeShader(ID3D11Device* device, HWND hwnd)
 {
 	HRESULT result;
 	ID3DBlob* errorMessage;
@@ -77,98 +74,85 @@ bool Shader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDesc;
 
+#pragma region gbuffer_vertex
 
-	// Initialize the pointers this function will use to null.
-	errorMessage = 0;
-	vertexShaderBuffer = 0;
-	pixelShaderBuffer = 0;
+	ID3D10Blob* vertexShaderBuffer = nullptr;
 	// Compile the vertex shader code.
-	result = D3DCompileFromFile(vsFilename, NULL, NULL, "VS_main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
+	result = D3DCompileFromFile(L"gbuffer_vertex.hlsl", NULL, NULL, "VS_main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
 		&vertexShaderBuffer, &errorMessage);
 	if (FAILED(result))
 	{
 		// If the shader failed to compile it should have writen something to the error message.
 		if (errorMessage)
 		{
-			OutputShaderErrorMessage(errorMessage, hwnd, vsFilename);
+			OutputShaderErrorMessage(errorMessage, hwnd, L"gbuffer_vertex.hlsl");
 		}
 		// If there was  nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
-			MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK);
+			MessageBox(hwnd, L"gbuffer_vertex.hlsl", L"Missing Shader File", MB_OK);
 		}
 
 		return false;
 	}
 
+	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_gbuffer_vertex);
+	
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	vertexShaderBuffer->Release();
+	vertexShaderBuffer = nullptr;
+
+	//create input layout to GVertex shader
+	D3D11_INPUT_ELEMENT_DESC gInputDesc[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
+	result = device->CreateInputLayout(gInputDesc, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &m_layout);
+
+	#pragma endregion
+
+#pragma region gbuffer_pixel
+
+	ID3D10Blob* pixelShaderBuffer = nullptr;
 	// Compile the pixel shader code.
-	result = D3DCompileFromFile(psFilename, NULL, NULL, "PS_main", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
+	result = D3DCompileFromFile(L"gbuffer_pixel.hlsl", NULL, NULL, "PS_main", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
 		&pixelShaderBuffer, &errorMessage);
 	if (FAILED(result))
 	{
 		// If the shader failed to compile it should have writen something to the error message.
 		if (errorMessage)
 		{
-			OutputShaderErrorMessage(errorMessage, hwnd, psFilename);
+			OutputShaderErrorMessage(errorMessage, hwnd, L"gbuffer_pixel.hlsl");
 		}
 		// If there was nothing in the error message then it simply could not find the file itself.
 		else
 		{
-			MessageBox(hwnd, psFilename, L"Missing Shader File", MB_OK);
+			MessageBox(hwnd, L"gbuffer_pixel.hlsl", L"Missing Shader File", MB_OK);
 		}
 
 		return false;
 	}
-	// Create the vertex shader from the buffer.
-	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
-	if (FAILED(result))
-	{
-		return false;
-	}
 
 	// Create the pixel shader from the buffer.
-	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
+	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_gbuffer_pixel);
 	if (FAILED(result))
 	{
 		return false;
 	}
-
-	// Create the vertex input layout description.
-	// This setup needs to match the VertexType stucture in the ModelClass and in the shader.
-	polygonLayout[0].SemanticName = "POSITION";
-	polygonLayout[0].SemanticIndex = 0;
-	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	polygonLayout[0].InputSlot = 0;
-	polygonLayout[0].AlignedByteOffset = 0;
-	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[0].InstanceDataStepRate = 0;
-
-	polygonLayout[1].SemanticName = "COLOR";
-	polygonLayout[1].SemanticIndex = 0;
-	polygonLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	polygonLayout[1].InputSlot = 0;
-	polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[1].InstanceDataStepRate = 0;
-
-	// Get a count of the elements in the layout.
-	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
-
-	// Create the vertex input layout.
-	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
-		vertexShaderBuffer->GetBufferSize(), &m_layout);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
-	vertexShaderBuffer->Release();
-	vertexShaderBuffer = 0;
 
 	pixelShaderBuffer->Release();
-	pixelShaderBuffer = 0;
+	pixelShaderBuffer = nullptr;
 
+#pragma endregion
+
+#pragma region matrixConstantBuffer
 	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
@@ -183,6 +167,8 @@ bool Shader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename
 	{
 		return false;
 	}
+
+#pragma endregion
 
 	return true;
 }
@@ -222,7 +208,7 @@ void Shader::OutputShaderErrorMessage(ID3DBlob* errorMessage, HWND hwnd, WCHAR* 
 	return;
 }
 
-bool Shader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix,
+bool Shader::SetConstantBuffer(ID3D11DeviceContext* deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix,
 	XMMATRIX &projectionMatrix)
 {
 	HRESULT result;
@@ -262,15 +248,26 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX &w
 	return true;
 }
 
-void Shader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
+
+
+void Shader::SetFirstPass(ID3D11DeviceContext* deviceContext)
 {
 	// Set the vertex input layout.
 	deviceContext->IASetInputLayout(m_layout);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
-	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+	deviceContext->VSSetShader(m_gbuffer_vertex, NULL, 0);
+	deviceContext->PSSetShader(m_gbuffer_pixel, NULL, 0);
+}
 
-	// Render the triangle.
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+void Shader::Render(ID3D11DeviceContext* deviceContext)
+{
+	// Set the vertex input layout.
+	deviceContext->IASetInputLayout(m_layout);
+
+	// Set the vertex and pixel shaders that will be used to render this triangle.
+	deviceContext->VSSetShader(m_gbuffer_vertex, NULL, 0);
+	deviceContext->PSSetShader(m_gbuffer_pixel, NULL, 0);
+
+	
 }
