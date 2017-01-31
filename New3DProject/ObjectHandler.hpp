@@ -24,6 +24,15 @@ struct Face
 class ObjectHandler
 {
 public:
+	struct SurfaceMaterial
+	{
+		std::wstring matName;
+		XMFLOAT4 difColor;
+		int texArrayIndex;
+		bool hasTexture;
+		bool transparent;
+	};
+
 	ObjectHandler();
 	ObjectHandler(const ObjectHandler &);
 	~ObjectHandler();
@@ -33,14 +42,16 @@ public:
 
 	int GetIndexCount();
 
-	bool LoadObjModel(string fileName,
-		// m_vertexBuff
-		// m_indexBuff
-		vector<XMFLOAT3> &vertices,
-		vector<XMFLOAT2> &texcoords,
-		vector<XMFLOAT3> &normals,
-		vector<Face> &faces,
-		bool rightHanded = false);
+	//Define LoadObjModel function after we create surfaceMaterial structure
+	bool LoadObjModel(std::string filename,        //.obj filename
+		ID3D11Buffer** vertBuff,            //mesh vertex buffer
+		ID3D11Buffer** indexBuff,            //mesh index buffer
+		std::vector<int>& subsetIndexStart,        //start index of each subset
+		std::vector<int>& subsetMaterialArray,        //index value of material for each subset
+		std::vector<SurfaceMaterial>& material,        //vector of material structures
+		int& subsetCount,                //Number of subsets in mesh
+		bool isRHCoordSys,                //true if model was created in right hand coord system
+		bool computeNormals);                //true to compute the normals, false to use the files normals
 
 private:
 	struct VertexType

@@ -5,8 +5,10 @@
 
 #include "D3D.hpp"
 #include "Camera.hpp"
-#include "Model.hpp"
-#include "Shader.hpp"
+//#include "Model.hpp"
+//#include "Shader.hpp"
+#include "Drawable.hpp"
+#include "DShader.hpp"
 #include "DInput.hpp"
 
 #define FULL_SCREEN false
@@ -28,9 +30,10 @@ private:
 	bool Render();
 	D3D m_Direct3D;
 	Camera m_Camera;
-	Model m_Model;
-	Shader m_Shader;
-
+	//Model m_Model;
+	//Shader m_Shader;
+	Drawable m_Drawable;
+	DShader m_DShader;
 };
 
 #endif /* GRAPHICS_HPP */

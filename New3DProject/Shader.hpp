@@ -33,7 +33,7 @@ private:
 	ID3D11Buffer* m_matrixBuffer;
 
 	bool InitializeShader(ID3D11Device*, HWND, WCHAR*, WCHAR*);
-	void OutputShaderErrorMessage(ID3D10Blob*, HWND, WCHAR*);
+	void OutputShaderErrorMessage(ID3DBlob*, HWND, WCHAR*);
 
 	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX &, XMMATRIX &, XMMATRIX &);
 	void RenderShader(ID3D11DeviceContext*, int);

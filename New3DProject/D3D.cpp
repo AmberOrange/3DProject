@@ -96,10 +96,10 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		return false;
 	}
 
-	if (!SetDepthBufferAndStencil(screenWidth, screenHeight))
-	{
-		return false;
-	}
+	//if (!SetDepthBufferAndStencil(screenWidth, screenHeight))
+	//{
+	//	return false;
+	//}
 	
 	// Setup the raster description which will determine how and what polygons will be drawn.
 	rasterDesc.AntialiasedLineEnable = false;
@@ -191,6 +191,11 @@ ID3D11Device * D3D::GetDevice()
 ID3D11DeviceContext * D3D::GetDeviceContext()
 {
 	return m_deviceContext;
+}
+
+IDXGISwapChain * D3D::GetSwapChain()
+{
+	return m_swapChain;
 }
 
 void D3D::GetProjectionMatrix(XMMATRIX &projectionMatrix)
@@ -322,7 +327,7 @@ bool D3D::SetDeviceAndSwapChain(int screenWidth, int screenHeight, unsigned int 
 	HRESULT result;
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	D3D_FEATURE_LEVEL featureLevel;
-	ID3D11Texture2D* backBufferPtr;
+	//ID3D11Texture2D* backBufferPtr;
 
 	// Initialize the swap chain description.
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
@@ -390,6 +395,7 @@ bool D3D::SetDeviceAndSwapChain(int screenWidth, int screenHeight, unsigned int 
 		return false;
 	}
 
+	/*
 	// Get the pointer to the back buffer.
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
@@ -403,10 +409,11 @@ bool D3D::SetDeviceAndSwapChain(int screenWidth, int screenHeight, unsigned int 
 	{
 		return false;
 	}
+	*/
 
 	// Release pointer to the back buffer as we no longer need it.
-	backBufferPtr->Release();
-	backBufferPtr = 0;
+	//backBufferPtr->Release();
+	//backBufferPtr = 0;
 
 	return true;
 }
