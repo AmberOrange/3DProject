@@ -38,9 +38,12 @@ DShader::~DShader()
 
 	for (int i = 0; i < GBUFFER_COUNT; i++)
 	{
-		m_gBufferTex[i]->Release();
-		m_gRTV[i]->Release();
-		m_gSRV[i]->Release();
+		if(m_gBufferTex[i] != nullptr)
+			m_gBufferTex[i]->Release();
+		if(m_gRTV[i] != nullptr)
+			m_gRTV[i]->Release();
+		if(m_gSRV[i] != nullptr)
+			m_gSRV[i]->Release();
 	}
 
 }
@@ -455,7 +458,6 @@ bool DShader::CreateBackBuffer(ID3D11Device *device, HWND hwnd, IDXGISwapChain *
 bool DShader::CreateGeometryBuffers(ID3D11Device *device, HWND hwnd, int screenWidth, int screenHeight)
 {
 	HRESULT result;
-
 	D3D11_TEXTURE2D_DESC textureDesc;
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResDesc;
@@ -465,7 +467,6 @@ bool DShader::CreateGeometryBuffers(ID3D11Device *device, HWND hwnd, int screenW
 	textureDesc.Height = screenHeight;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -474,17 +475,35 @@ bool DShader::CreateGeometryBuffers(ID3D11Device *device, HWND hwnd, int screenW
 	textureDesc.MiscFlags = 0;
 
 	ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
-	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 
 	ZeroMemory(&shaderResDesc, sizeof(shaderResDesc));
-	shaderResDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	shaderResDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResDesc.Texture2D.MostDetailedMip = 0;
 	shaderResDesc.Texture2D.MipLevels = 1;
 
 	// Create everything for the GBuffers
+	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	renderTargetViewDesc.Format = textureDesc.Format;
+	shaderResDesc.Format = textureDesc.Format;
+
+	//if(!GenerateGeometryBuffers(device, hwnd, &textureDesc, &renderTargetViewDesc, &shaderResDesc, 0)) // POS X Y Z
+	//	return false;
+
+	//if (!GenerateGeometryBuffers(device, hwnd, &textureDesc, &renderTargetViewDesc, &shaderResDesc, 2)) // DIF R G B
+	//	return false;
+
+	//if (!GenerateGeometryBuffers(device, hwnd, &textureDesc, &renderTargetViewDesc, &shaderResDesc, 3)) // SPEC R G B
+	//	return false;
+
+
+	////textureDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
+	////renderTargetViewDesc.Format = textureDesc.Format;
+	////shaderResDesc.Format = textureDesc.Format;
+	//if (!GenerateGeometryBuffers(device, hwnd, &textureDesc, &renderTargetViewDesc, &shaderResDesc, 1)) // NOR X Y Z
+	//	return false;
+
 	for (int i = 0; i < GBUFFER_COUNT; i++)
 	{
 		result = device->CreateTexture2D(&textureDesc, NULL, &m_gBufferTex[i]);
@@ -507,8 +526,35 @@ bool DShader::CreateGeometryBuffers(ID3D11Device *device, HWND hwnd, int screenW
 			MessageBox(hwnd, L"Unable to Create one of the ShaderResourceViews in m_gSRV", L"Unable to Create ShaderResourceView", MB_OK);
 			return false;
 		}
+
 	}
 
+	return true;
+}
+
+bool DShader::GenerateGeometryBuffers(ID3D11Device *device, HWND hwnd, D3D11_TEXTURE2D_DESC *textureDesc, D3D11_RENDER_TARGET_VIEW_DESC *renderTargetViewDesc, D3D11_SHADER_RESOURCE_VIEW_DESC *shaderResDesc, int i)
+{
+	HRESULT result;
+	result = device->CreateTexture2D(textureDesc, NULL, &m_gBufferTex[i]);
+	if (FAILED(result))
+	{
+		MessageBox(hwnd, L"Unable to Create one of the Textures in m_gBufferTex", L"Unable to Create Texture2D", MB_OK);
+		return false;
+	}
+
+	result = device->CreateRenderTargetView(m_gBufferTex[i], renderTargetViewDesc, &m_gRTV[i]);
+	if (FAILED(result))
+	{
+		MessageBox(hwnd, L"Unable to Create one of the RenderTargetViews in m_gRTV", L"Unable to Create RenderTargetView", MB_OK);
+		return false;
+	}
+
+	result = device->CreateShaderResourceView(m_gBufferTex[i], shaderResDesc, &m_gSRV[i]);
+	if (FAILED(result))
+	{
+		MessageBox(hwnd, L"Unable to Create one of the ShaderResourceViews in m_gSRV", L"Unable to Create ShaderResourceView", MB_OK);
+		return false;
+	}
 
 	return true;
 }
@@ -549,14 +595,14 @@ bool DShader::GenerateScreenQuad(ID3D11Device * device, HWND hwnd)
 	};
 
 	QuadStruct vertex[] = {
-		-0.5f,	-0.5f, 0.f,
-		0.0f,	0.0f,
-		-0.5f,	0.5f, 0.f,
-		1.0f,	0.0f,
-		0.5f,	-0.5f, 0.f,
+		-1.0f,	-1.0f, 0.f,
 		0.0f,	1.0f,
-		0.5f,	0.5f, 0.f,
-		1.0f,	1.0f
+		-1.0f,	1.0f, 0.f,
+		0.0f,	0.0f,
+		1.0f,	-1.0f, 0.f,
+		1.0f,	1.0f,
+		1.0f,	1.0f, 0.f,
+		1.0f,	0.0f
 	};
 
 	D3D11_BUFFER_DESC bufferDesc;
@@ -670,14 +716,17 @@ void DShader::SetupFirstPass(ID3D11DeviceContext *deviceContext)
 	deviceContext->VSSetShader(m_gshader_vertex, nullptr, 0);
 	deviceContext->IASetInputLayout(m_gshader_input);
 	//deviceContext->GSSetShader(m_gshader_geometry, nullptr, 0); // Doesn't exist yet
-	deviceContext->PSSetShader(m_test_pixel, nullptr, 0);
+	deviceContext->PSSetShader(m_gshader_pixel, nullptr, 0);
 
-	//deviceContext->OMSetRenderTargets(GBUFFER_COUNT, m_gRTV, m_depthStencilView);
-	deviceContext->OMSetRenderTargets(1, &m_renderTargetView, nullptr);
+	deviceContext->OMSetRenderTargets(GBUFFER_COUNT, m_gRTV, m_depthStencilView);
+	//deviceContext->OMSetRenderTargets(1, &m_renderTargetView, nullptr);
 }
 
 void DShader::SetupBackBufferPass(ID3D11DeviceContext *deviceContext)
 {
+	ID3D11RenderTargetView* temp[] = { nullptr, nullptr, nullptr, nullptr };
+	deviceContext->OMSetRenderTargets(4, temp, nullptr);
+
 	deviceContext->VSSetShader(m_deferred_vertex, nullptr, 0);
 	deviceContext->IASetInputLayout(m_deferred_input);
 	deviceContext->PSSetShader(m_deferred_pixel, nullptr, 0);

@@ -13,18 +13,10 @@ struct PS_IN
 
 float4 PS_main( PS_IN input ) : SV_TARGET0
 {
-
-	// Implement all light calculations here later
-	// Using only texture colour
-
-	//return float4(1.0f,0.0f,0.0f,0.0f);
-	//if(Pos_tex.Sample(sampleState, input.Tex).y == float4(0.0f,0.0f,0.0f,0.0f).y)
-	//{
-	//	return float4(1.0f,0.f,0.f,0.f);
-	//} else {
-	//	return float4(0.f,1.0f,0.f,0.f);
-	//}
-
-	return Dif_tex.Sample(sampleState, input.Tex );
+	float3 Pos = Pos_tex.Sample(sampleState, input.Tex);
+	float3 Nor = Nor_tex.Sample(sampleState, input.Tex);
+	float3 Dif = Dif_tex.Sample(sampleState, input.Tex);
+	float3 Spec = Spec_tex.Sample(sampleState, input.Tex);
+	return float4(Dif,1.f);
 	//return float4(0.f,0.f,1.f,0.f);
 }

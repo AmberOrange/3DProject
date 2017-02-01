@@ -69,6 +69,7 @@ private:
 	bool CreateSamplerState(ID3D11Device *device, ID3D11DeviceContext* deviceContext, HWND hwnd);
 	bool CreateBackBuffer(ID3D11Device *device, HWND hwnd, IDXGISwapChain *swapChain);
 	bool CreateGeometryBuffers(ID3D11Device *device, HWND hwnd, int screenWidth, int screenHeight);
+	bool GenerateGeometryBuffers(ID3D11Device *device, HWND hwnd, D3D11_TEXTURE2D_DESC *textureDesc, D3D11_RENDER_TARGET_VIEW_DESC *renderTargetViewDesc, D3D11_SHADER_RESOURCE_VIEW_DESC *shaderResDesc, int i);
 	bool CreateConstantBuffers(ID3D11Device *device, HWND hwnd);
 	bool GenerateScreenQuad(ID3D11Device *device, HWND hwnd);
 
