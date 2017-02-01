@@ -6,17 +6,11 @@
 #include <DirectXMath.h>
 #include <sstream>
 
+#include "Mesh.hpp"
+
 
 using namespace DirectX;
 using namespace std;
-typedef unsigned int UINT;
-
-struct Vertex
-{
-	XMFLOAT3 Pos;
-	XMFLOAT2 TC;
-	XMFLOAT3 Normal;
-};
 
 /*		*** HOW TO USE ***
 *	1. Load object from .obj.
@@ -24,22 +18,21 @@ struct Vertex
 *	3. Render
 */
 
-class Object
+class ObjectLoader
 {
+private:
+
+	Mesh* meshes;
+	ID3D11Buffer* vertexBuffer;
+
 public:
 
-	Object();
-	~Object();
+	ObjectLoader();
+	~ObjectLoader();
 
-	bool loadObj(wstring filename, bool RHCoordSys = false);
+	bool loadFromFile(string filename, bool RHCoordSys = false);
+
 	bool createBuffer(ID3D11Device* device);
 	bool render(ID3D11DeviceContext* deviceContext);
 
-protected:
-
-	UINT* indices;
-	Vertex* vertices;
-	ID3D11Buffer* vertexBuffer;
-
-	int nrOfVertices;
 };
