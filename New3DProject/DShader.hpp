@@ -1,7 +1,7 @@
 #ifndef DSHADER_HPP
 #define DSHADER_HPP
 
-#define GBUFFER_COUNT 4
+#define GBUFFER_COUNT 3
 
 #include <d3d11.h>
 #include <d3dcompiler.h>

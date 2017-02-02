@@ -665,13 +665,13 @@ void DShader::ShaderBlobMessage(ID3DBlob * errorMessage, HWND hwnd, WCHAR * shad
 
 void DShader::EmptyBuffers(ID3D11DeviceContext * deviceContext)
 {
-	float color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	for (int i = 0; i < GBUFFER_COUNT; i++)
 	{
 		deviceContext->ClearRenderTargetView(m_gRTV[i], color);
 	}
-	float bcolor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float bcolor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	deviceContext->ClearRenderTargetView(m_renderTargetView, bcolor);
 	deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
