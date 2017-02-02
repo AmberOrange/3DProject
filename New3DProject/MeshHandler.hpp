@@ -1,7 +1,6 @@
 #pragma once
 #include <fstream>
 #include <vector>
-#include <d3d11.h>
 #include <xstring>
 #include <DirectXMath.h>
 #include <sstream>
@@ -25,21 +24,16 @@ class MeshHandler
 private:
 
 	Mesh** meshes;
-	ID3D11Buffer* vertexBuffer;
 
 	int nrOfMeshes;
 	int capacity;
+
+	void nullArray();
 
 public:
 
 	MeshHandler();
 	~MeshHandler();
 
-	void nullArray();
-
-	bool loadFromFile(string filename, bool RHCoordSys = false);
-
-	bool createBuffer(ID3D11Device* device);
-	bool render(ID3D11DeviceContext* deviceContext);
-
+	bool add();
 };
