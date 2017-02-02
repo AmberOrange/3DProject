@@ -17,7 +17,7 @@ float4 PS_main( PS_IN input ) : SV_TARGET0
 	float4 Dif = Dif_tex.Sample(sampleState, input.Tex);
 	float3 Spec = float3(Pos.w, Nor.w, Dif.w);
 
-	//return Dif;
-	return float4(Spec,1.0f);
+	return Dif;
+	//return float4(Spec,1.0f);
 	//return float4(0.f,0.f,1.f,0.f);
 }

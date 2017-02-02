@@ -1,5 +1,32 @@
 #include "Object.hpp"
 
+Object::Object()
+{
+
+}
+
+Object::Object(string fileName, bool RHCoordSys)
+{
+	this->fileName = fileName;
+	this->RHCoordSys = RHCoordSys;
+}
+
+Object::~Object()
+{
+
+}
+
+bool Object::Initialize(ID3D11Device* device)
+{
+	if (!this->loadFromFile(this->fileName))
+		return false;
+
+	if (!this->CreateBuffer(device))
+		return false;
+
+	return true;
+}
+
 bool Object::loadFromFile(string fileName)
 {
 	ifstream fileIn(fileName, ifstream::in);
@@ -115,10 +142,10 @@ bool Object::loadFromFile(string fileName)
 	{
 		this->vertices[i].Position = vPos[indPos[i] - 1];
 
-		if (this->hasTexcoords)
+		if (indPos[i] != 0)
 			this->vertices[i].Texcoord = vTC[indTC[i] - 1];
 
-		if (hasNormals)
+		if (indNor[i] != 0)
 			vertices[i].Normal = vNor[indNor[i] - 1];
 	}
 
@@ -149,13 +176,18 @@ bool Object::loadFromFile(string fileName)
 	{
 		int newSize;
 		int sampler;
+
+		int face;
 		int facePart;
+
 		Vertex *newVertices;
 
 		// If faces store quads, two more
 		// vertices will be added per face.
 		newSize = this->nrOfVertices + 2 * nrOfFaces;
 		sampler = 0;
+
+		face = 1;
 		facePart = 1;
 
 		newVertices = new Vertex[newSize];
@@ -182,6 +214,12 @@ bool Object::loadFromFile(string fileName)
 		newVertices = nullptr;
 	}
 }
+
+Mesh *Object::Clone()
+{
+	return new Object(*this);
+}
+
 
 XMFLOAT3 Object::getAsVec3(string line)
 {

@@ -12,10 +12,19 @@ class Object : public Mesh
 {
 public:
 
+	Object();
+	Object(string fileName, bool RHCoordSys = false);
+	~Object();
+
+	bool Initialize(ID3D11Device* device);
+
 	// Load from .obj file.
 	bool loadFromFile(string fileName);
 
+	virtual Mesh *Clone();
 private:
+
+	string fileName;
 
 	// Extract information from lines.
 	XMFLOAT3 getAsVec3(string line);
@@ -27,4 +36,6 @@ private:
 	XMFLOAT3 getNormal(XMFLOAT3 pos1, XMFLOAT3 pos2, XMFLOAT3 pos3);
 	XMFLOAT3 getVecBetween(XMFLOAT3 pos1, XMFLOAT3 pos2);
 	float getVecLength(XMFLOAT3 vec);
+
+
 };

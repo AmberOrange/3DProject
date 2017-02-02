@@ -27,7 +27,16 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_Camera.SetPosition(0.0f, 0.0f, -5.0f);
 
-	if (!m_Drawable.Initialize(m_Direct3D.GetDevice(), hwnd))
+	/*if (!m_Drawable.Initialize(m_Direct3D.GetDevice(), hwnd))
+	{
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+	*/
+
+	CreateWICTextureFromFile(m_Direct3D.GetDevice(), L"Isaac.png", nullptr, &m_resource);
+
+	if (!m_MeshHandler.Initialize(m_Direct3D.GetDevice(), hwnd))
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -68,8 +77,9 @@ bool Graphics::Frame(DInput &input)
 
 bool Graphics::Render()
 {
-
-	m_Drawable.Draw(m_Direct3D.GetDeviceContext());
+	m_Direct3D.GetDeviceContext()->PSSetShaderResources(0, 1, &m_resource);
+	m_MeshHandler.DrawAll(m_Direct3D.GetDeviceContext());
+	//m_Drawable.Draw(m_Direct3D.GetDeviceContext());
 
 	m_DShader.FinalizeBackBuffer(m_Direct3D.GetDeviceContext());
 

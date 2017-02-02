@@ -5,7 +5,7 @@
 #include <DirectXMath.h>
 #include <sstream>
 
-#include "Mesh.hpp"
+#include "Object.hpp"
 
 #define CAP 5
 
@@ -29,11 +29,15 @@ private:
 	int capacity;
 
 	void nullArray();
+	void Expand();
 
 public:
 
 	MeshHandler();
 	~MeshHandler();
 
-	bool add();
+	bool add(Mesh &mesh);
+
+	bool Initialize(ID3D11Device *device, HWND hwnd);
+	bool DrawAll(ID3D11DeviceContext *deviceContext);
 };

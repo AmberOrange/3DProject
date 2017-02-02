@@ -7,9 +7,12 @@
 #include "Camera.hpp"
 //#include "Model.hpp"
 //#include "Shader.hpp"
+#include "MeshHandler.hpp"
 #include "Drawable.hpp"
 #include "DShader.hpp"
 #include "DInput.hpp"
+
+#include "WICTextureLoader.h"
 
 #define FULL_SCREEN false
 #define VSYNC_ENABLED true
@@ -32,8 +35,11 @@ private:
 	Camera m_Camera;
 	//Model m_Model;
 	//Shader m_Shader;
-	Drawable m_Drawable;
+	//Drawable m_Drawable;
+	MeshHandler m_MeshHandler;
 	DShader m_DShader;
+
+	ID3D11ShaderResourceView *m_resource;
 };
 
 #endif /* GRAPHICS_HPP */

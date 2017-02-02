@@ -665,7 +665,7 @@ void DShader::ShaderBlobMessage(ID3DBlob * errorMessage, HWND hwnd, WCHAR * shad
 
 void DShader::EmptyBuffers(ID3D11DeviceContext * deviceContext)
 {
-	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float color[] = { 0.0f, 1.0f, 0.0f, 0.0f };
 
 	for (int i = 0; i < GBUFFER_COUNT; i++)
 	{
