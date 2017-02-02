@@ -1,6 +1,6 @@
-#include "ObjectLoader.hpp"
+#include "MeshHandler.hpp"
 
-ObjectLoader::ObjectLoader()
+MeshHandler::MeshHandler()
 {
 	this->capacity = CAP;
 	this->nrOfMeshes = 0;
@@ -9,19 +9,19 @@ ObjectLoader::ObjectLoader()
 	this->nullArray();
 }
 
-ObjectLoader::~ObjectLoader()
+MeshHandler::~MeshHandler()
 {
 	this->nullArray();
 }
 
-bool ObjectLoader::loadFromFile(string filename, bool RHCoordSys)
+bool MeshHandler::loadFromFile(string filename, bool RHCoordSys)
 {
 
 	// ?
 	return true;
 }
 
-void ObjectLoader::nullArray()
+void MeshHandler::nullArray()
 {
 	for (int i = 0; i < this->capacity; i++)
 	{
@@ -30,7 +30,7 @@ void ObjectLoader::nullArray()
 	}
 }
 
-bool ObjectLoader::createBuffer(ID3D11Device* device)
+bool MeshHandler::createBuffer(ID3D11Device* device)
 {
 	/*
 	*	FIX:
@@ -70,7 +70,7 @@ bool ObjectLoader::createBuffer(ID3D11Device* device)
 	return true;
 }
 
-bool ObjectLoader::render(ID3D11DeviceContext* deviceContext)
+bool MeshHandler::render(ID3D11DeviceContext* deviceContext)
 {
 	UINT stride;
 	UINT offset;

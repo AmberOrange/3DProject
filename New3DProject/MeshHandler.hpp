@@ -20,7 +20,7 @@ using namespace std;
 *	3. Render
 */
 
-class ObjectLoader
+class MeshHandler
 {
 private:
 
@@ -32,8 +32,8 @@ private:
 
 public:
 
-	ObjectLoader();
-	~ObjectLoader();
+	MeshHandler();
+	~MeshHandler();
 
 	void nullArray();
 
