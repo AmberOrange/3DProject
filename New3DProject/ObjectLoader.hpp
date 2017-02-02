@@ -8,6 +8,8 @@
 
 #include "Mesh.hpp"
 
+#define CAP = 5;
+
 
 using namespace DirectX;
 using namespace std;
@@ -22,13 +24,18 @@ class ObjectLoader
 {
 private:
 
-	Mesh* meshes;
+	Mesh** meshes;
 	ID3D11Buffer* vertexBuffer;
+
+	int nrOfMeshes;
+	int capacity;
 
 public:
 
 	ObjectLoader();
 	~ObjectLoader();
+
+	void nullArray();
 
 	bool loadFromFile(string filename, bool RHCoordSys = false);
 

@@ -18,18 +18,12 @@ Mesh::~Mesh()
 
 bool Mesh::loadFromFile(string fileName)
 {
-	/*
-	*	FIX
-	*	Store values in vertex array.
-	*	Normal calculation.
-	*	Expand vertex array to trianglelist, from trianglestrip.
-	*/
-
 	ifstream fileIn(fileName, ifstream::in);
 	
 	int nrOfPos;
 	int nrOfTC;
 	int nrOfNor;
+	int nrOfFaces;
 	string line;
 	bool hasNormals;
 	XMFLOAT3 tempPos;
@@ -46,6 +40,7 @@ bool Mesh::loadFromFile(string fileName)
 	nrOfPos = 0;
 	nrOfTC = 0;
 	nrOfNor = 0;
+	nrOfFaces = 0;
 	hasNormals = true;
 
 	if (fileIn.is_open())
@@ -112,9 +107,11 @@ bool Mesh::loadFromFile(string fileName)
 					}
 
 					if (faceDefAsTriangles)
-						nrOfVertices += 3;
+						this->nrOfVertices += 3;
 					else
-						nrOfVertices += 4;
+						this->nrOfVertices += 4;
+
+					nrOfFaces++;
 				}
 
 				break;
@@ -127,6 +124,79 @@ bool Mesh::loadFromFile(string fileName)
 		return false;
 	}
 	fileIn.close();
+
+	// Store values in vertices array.
+	this->vertices = new Vertex[this->nrOfVertices];
+	for (int i = 0; i < this->nrOfVertices; i++)
+	{
+		this->vertices[i].Position = vPos[indPos[i] - 1];
+
+		if (this->hasTexcoords)
+			this->vertices[i].Texcoord = vTC[indTC[i] - 1];
+
+		if (hasNormals)
+			vertices[i].Normal = vNor[indNor[i] - 1];
+	}
+
+	// Compute Normals if not stored in obj file.
+	if (!hasNormals)
+	{
+		int jump;
+
+		if (faceDefAsTriangles)
+			jump = 3;
+		else // Quad
+			jump = 4;
+
+		for (int i = 0; i < this->nrOfVertices; i += jump)
+		{
+			tempNor = getNormal(this->vertices[i].Position, this->vertices[i + 1].Position, this->vertices[i + 2].Position);
+		
+			for (int j = i; j < i + jump; j++)
+			{
+				this->vertices[j].Normal = tempNor;
+				nrOfNor++;
+			}
+		}
+	}
+
+	// Expand array
+	if (!faceDefAsTriangles)
+	{	
+		int newSize;
+		int sampler;
+		int facePart;
+		Vertex *newVertices;
+		
+		// If faces store quads, two more
+		// vertices will be added per face.
+		newSize = this->nrOfVertices + 2 * nrOfFaces;
+		sampler = 0;
+		facePart = 1;
+
+		newVertices = new Vertex[newSize];
+
+		// Fill new vertex array.
+		for (int i = 0; i < newSize; i++)
+		{
+			newVertices[i] = this->vertices[sampler];
+
+			if (facePart == 3)
+				sampler--;
+			else
+				sampler++;
+
+			if (facePart == 4)
+				facePart = 0; // Reset
+
+			facePart++;		
+		}
+
+		// Switch to new array and delete old.
+		delete[]this->vertices;
+		this->vertices = newVertices;
+		newVertices = nullptr;
+	}
 }
 
 XMFLOAT3 Mesh::getAsVec3(string line)

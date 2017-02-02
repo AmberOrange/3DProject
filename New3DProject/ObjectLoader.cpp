@@ -1,8 +1,25 @@
 #include "ObjectLoader.hpp"
 
+ObjectLoader::ObjectLoader()
+{
+	capacity
+}
+
+ObjectLoader::~ObjectLoader()
+{
+
+}
+
 bool ObjectLoader::loadFromFile(string filename, bool RHCoordSys)
 {
+
+
 	return true;
+}
+
+void nullArray()
+{
+
 }
 
 bool ObjectLoader::createBuffer(ID3D11Device* device)
