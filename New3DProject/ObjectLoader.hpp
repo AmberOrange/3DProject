@@ -8,7 +8,7 @@
 
 #include "Mesh.hpp"
 
-#define CAP = 5;
+#define CAP 5
 
 
 using namespace DirectX;

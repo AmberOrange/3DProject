@@ -2,24 +2,32 @@
 
 ObjectLoader::ObjectLoader()
 {
-	capacity
+	this->capacity = CAP;
+	this->nrOfMeshes = 0;
+
+	this->meshes = new Mesh*[this->capacity];
+	this->nullArray();
 }
 
 ObjectLoader::~ObjectLoader()
 {
-
+	this->nullArray();
 }
 
 bool ObjectLoader::loadFromFile(string filename, bool RHCoordSys)
 {
 
-
+	// ?
 	return true;
 }
 
-void nullArray()
+void ObjectLoader::nullArray()
 {
-
+	for (int i = 0; i < this->capacity; i++)
+	{
+		// May delete object.
+		this->meshes[i] = nullptr;
+	}
 }
 
 bool ObjectLoader::createBuffer(ID3D11Device* device)
