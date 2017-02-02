@@ -5,10 +5,9 @@ Object::Object()
 
 }
 
-Object::Object(string fileName, bool RHCoordSys)
+Object::Object(string fileName, bool RHCoordSys) : Mesh(RHCoordSys)
 {
 	this->fileName = fileName;
-	this->RHCoordSys = RHCoordSys;
 }
 
 Object::~Object()
@@ -104,23 +103,62 @@ bool Object::loadFromFile(string fileName)
 					tempFace = getAsFace(line);
 
 					// Face defined as quad instead of triangle.
-					if (faceDefAsTriangles && tempFace.indNor[3] != 0)
-						faceDefAsTriangles = false;
+					if (tempFace.indPos[3] != 0)
+						this->faceDefAsTriangles = false;
 
-					// Face may store 4 values per Pos/TC/Nor.
-					// If the 4th is not used, it will have the
-					// value 0 by default.
-					for (int i = 0; i < 4; i++)
+					//// Face may store 4 values per Pos/TC/Nor.
+					//// If the 4th is not used, it will have the
+					//// value 0 by default.
+					//for (int i = 0; i < 4; i++)
+					//{
+					//	indPos.push_back(tempFace.indPos[i]);
+					//	indTC.push_back(tempFace.indTC[i]);
+					//	indNor.push_back(tempFace.indNor[i]);
+					//}
+
+					for (int i = 0; i < 3; i++)
 					{
 						indPos.push_back(tempFace.indPos[i]);
 						indTC.push_back(tempFace.indTC[i]);
 						indNor.push_back(tempFace.indNor[i]);
+
+						this->nrOfVertices++;
 					}
 
-					if (faceDefAsTriangles)
+					if (!this->faceDefAsTriangles)
+					{
+						/*indPos.push_back(tempFace.indPos[0]);
+						indPos.push_back(tempFace.indPos[2]);
+						indPos.push_back(tempFace.indPos[3]);
+
+						indTC.push_back(tempFace.indTC[0]);
+						indTC.push_back(tempFace.indTC[2]);
+						indTC.push_back(tempFace.indTC[3]);
+
+						indNor.push_back(tempFace.indNor[0]);
+						indNor.push_back(tempFace.indNor[2]);
+						indNor.push_back(tempFace.indNor[3]);*/
+
+						indPos.push_back(tempFace.indPos[2]);
+						indPos.push_back(tempFace.indPos[3]);
+						indPos.push_back(tempFace.indPos[0]);
+
+						indTC.push_back(tempFace.indTC[2]);
+						indTC.push_back(tempFace.indTC[3]);
+						indTC.push_back(tempFace.indTC[0]);
+
+						indNor.push_back(tempFace.indNor[2]);
+						indNor.push_back(tempFace.indNor[3]);
+						indNor.push_back(tempFace.indNor[0]);
+
+						this->nrOfVertices += 3;
+					}
+
+
+					/*if (this->faceDefAsTriangles)
 						this->nrOfVertices += 3;
 					else
-						this->nrOfVertices += 4;
+						this->nrOfVertices += 4;*/
 
 					nrOfFaces++;
 				}
@@ -140,9 +178,10 @@ bool Object::loadFromFile(string fileName)
 	this->vertices = new Vertex[this->nrOfVertices];
 	for (int i = 0; i < this->nrOfVertices; i++)
 	{
-		this->vertices[i].Position = vPos[indPos[i] - 1];
-
 		if (indPos[i] != 0)
+			this->vertices[i].Position = vPos[indPos[i] - 1];
+
+		if (indTC[i] != 0)
 			this->vertices[i].Texcoord = vTC[indTC[i] - 1];
 
 		if (indNor[i] != 0)
@@ -154,10 +193,10 @@ bool Object::loadFromFile(string fileName)
 	{
 		int jump;
 
-		if (faceDefAsTriangles)
+		//if (faceDefAsTriangles)
 			jump = 3;
-		else // Quad
-			jump = 4;
+		//else // Quad
+		//	jump = 4;
 
 		for (int i = 0; i < this->nrOfVertices; i += jump)
 		{
@@ -171,48 +210,57 @@ bool Object::loadFromFile(string fileName)
 		}
 	}
 
-	// Expand array
-	if (!faceDefAsTriangles)
-	{
-		int newSize;
-		int sampler;
+	//// Expand array
+	//if (!faceDefAsTriangles)
+	//{
+	//	int newSize;
+	//	int sampler;
 
-		int face;
-		int facePart;
+	//	int face;
+	//	int vert;
 
-		Vertex *newVertices;
+	//	Vertex *newVertices;
 
-		// If faces store quads, two more
-		// vertices will be added per face.
-		newSize = this->nrOfVertices + 2 * nrOfFaces;
-		sampler = 0;
+	//	// If faces store quads, two more
+	//	// vertices will be added per face.
+	//	newSize = this->nrOfVertices + 2 * nrOfFaces;
+	//	sampler = 0;
 
-		face = 1;
-		facePart = 1;
+	//	face = 1;
+	//	vert = 1;
 
-		newVertices = new Vertex[newSize];
+	//	newVertices = new Vertex[newSize];
 
-		// Fill new vertex array.
-		for (int i = 0; i < newSize; i++)
-		{
-			newVertices[i] = this->vertices[sampler];
+	//	// Fill new vertex array.
+	//	for (int i = 0; i < newSize; i++)
+	//	{
+	//		newVertices[i] = this->vertices[sampler];
 
-			if (facePart == 3)
-				sampler--;
-			else
-				sampler++;
+	//		if (face == 1 && vert == 3)
+	//		{
+	//			face++;
+	//			vert = 1;
+	//		}
+	//		else if (face == 2 && vert == 1)
+	//			sampler--;
+	//		else
+	//			sampler++;
 
-			if (facePart == 4)
-				facePart = 0; // Reset
+	//		// Reset
+	//		if (face == 2 && vert == 3)
+	//		{
+	//			face = 1;
+	//			vert = 0;
+	//		}
 
-			facePart++;
-		}
+	//		vert++;
+	//	}
 
-		// Switch to new array and delete old.
-		delete[]this->vertices;
-		this->vertices = newVertices;
-		newVertices = nullptr;
-	}
+	//	// Switch to new array and delete old.
+	//	delete[]this->vertices;
+	//	this->vertices = newVertices;
+	//	newVertices = nullptr;
+	//}
 }
 
 Mesh *Object::Clone()

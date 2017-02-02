@@ -20,7 +20,7 @@ class Mesh
 {
 public:
 
-	Mesh();
+	Mesh(bool RHCoordSys = false);
 	~Mesh();
 
 	virtual bool Initialize(ID3D11Device* device) = 0;

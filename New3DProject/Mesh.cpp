@@ -1,8 +1,8 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh()
+Mesh::Mesh(bool RHCoordSys)
 {
-	this->RHCoordSys = false;
+	this->RHCoordSys = RHCoordSys;
 	this->hasTexcoords = false;
 	this->faceDefAsTriangles = true;
 

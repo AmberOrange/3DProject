@@ -11,7 +11,10 @@ MeshHandler::MeshHandler()
 
 MeshHandler::~MeshHandler()
 {
-	this->nullArray();
+	for (int i = 0; i < this->nrOfMeshes; i++)
+		delete this->meshes[i];
+
+	delete[]this->meshes;
 }
 
 void MeshHandler::nullArray()
@@ -25,6 +28,20 @@ void MeshHandler::nullArray()
 
 void MeshHandler::Expand()
 {
+	this->capacity += 100;
+	Mesh **newMeshes = new Mesh*[this->capacity];
+
+	for (int i = 0; i < this->capacity; i++)
+	{
+		if (i < this->nrOfMeshes)
+			newMeshes[i] = this->meshes[i];
+		else
+			newMeshes[i] = nullptr;
+	}
+
+	delete[]this->meshes;
+	this->meshes = newMeshes;
+	newMeshes = nullptr;
 }
 
 bool MeshHandler::add(Mesh &mesh)
@@ -41,6 +58,7 @@ bool MeshHandler::add(Mesh &mesh)
 
 bool MeshHandler::Initialize(ID3D11Device *device, HWND hwnd)
 {
+	this->add(Object("Cow.obj"));
 	this->add(Object("Crate.obj"));
 
 	for (int i = 0; i < this->nrOfMeshes; i++)

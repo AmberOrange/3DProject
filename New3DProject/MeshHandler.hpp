@@ -23,7 +23,7 @@ class MeshHandler
 {
 private:
 
-	Mesh** meshes;
+	Mesh **meshes;
 
 	int nrOfMeshes;
 	int capacity;
