@@ -1,6 +1,6 @@
 #include "ObjectLoader.hpp"
 
-bool ObjectLoader::loadFromFile(string filename, bool RHCoordSys = false)
+bool ObjectLoader::loadFromFile(string filename, bool RHCoordSys)
 {
 	return true;
 }
