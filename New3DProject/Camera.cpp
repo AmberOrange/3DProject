@@ -44,7 +44,7 @@ XMFLOAT3 Camera::GetRotation()
 	return m_rotation;
 }
 
-bool Camera::Frame(DInput &dinput)
+bool Camera::Frame(Input &input)
 {
 	XMVECTOR rightVector, lookVector;
 	XMFLOAT3 right, look;
@@ -52,10 +52,10 @@ bool Camera::Frame(DInput &dinput)
 	float speed = 0.1f;
 	int mouseX, mouseY;
 
-	dinput.GetMouseMovement(mouseX, mouseY);
+	//dinput.GetMouseMovement(mouseX, mouseY);
 
-	m_rotation.y += ((float)mouseX)*speed;
-	m_rotation.x += ((float)mouseY)*speed;
+	m_rotation.y += ((float)input.GetMouseX())*speed;
+	m_rotation.x += ((float)input.GetMouseY())*speed;
 
 	rotationMatrix = XMMatrixRotationRollPitchYaw(
 		m_rotation.x * 0.0174532925f,
@@ -68,25 +68,25 @@ bool Camera::Frame(DInput &dinput)
 	XMStoreFloat3(&look, lookVector);
 	XMStoreFloat3(&right, rightVector);
 
-	if (dinput.IsKeyPressed(DIK_W))
+	if (input.IsKeyDown(0x57))
 		m_position = XMFLOAT3(
 			m_position.x + look.x * speed,
 			m_position.y + look.y * speed,
 			m_position.z + look.z * speed
 		);
-	if (dinput.IsKeyPressed(DIK_S))
+	if (input.IsKeyDown(0x53))
 		m_position = XMFLOAT3(
 			m_position.x - look.x * speed,
 			m_position.y - look.y * speed,
 			m_position.z - look.z * speed
 		);
-	if (dinput.IsKeyPressed(DIK_A))
+	if (input.IsKeyDown(0x41))
 		m_position = XMFLOAT3(
 			m_position.x - right.x * speed,
 			m_position.y - right.y * speed,
 			m_position.z - right.z * speed
 		);
-	if (dinput.IsKeyPressed(DIK_D))
+	if (input.IsKeyDown(0x44))
 		m_position = XMFLOAT3(
 			m_position.x + right.x * speed,
 			m_position.y + right.y * speed,

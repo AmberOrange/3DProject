@@ -51,7 +51,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	return true;
 }
 
-bool Graphics::Frame(DInput &input)
+bool Graphics::Frame(Input &input)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;

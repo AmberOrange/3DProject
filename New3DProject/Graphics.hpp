@@ -10,7 +10,8 @@
 #include "MeshHandler.hpp"
 #include "Drawable.hpp"
 #include "DShader.hpp"
-#include "DInput.hpp"
+//#include "DInput.hpp"
+#include "Input.hpp"
 
 #include "WICTextureLoader.h"
 
@@ -27,7 +28,8 @@ public:
 	~Graphics();
 
 	bool Initialize(int, int, HWND);
-	bool Frame(DInput &);
+	//bool Frame(DInput &);
+	bool Frame(Input &);
 
 private:
 	bool Render();

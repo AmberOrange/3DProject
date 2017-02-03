@@ -2,7 +2,7 @@
 #define CAMERA_HPP
 
 #include <DirectXMath.h>
-#include "DInput.hpp"
+#include "Input.hpp"
 
 using namespace DirectX;
 
@@ -19,7 +19,7 @@ public:
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
 
-	bool Frame(DInput &);
+	bool Frame(Input &);
 	void Render();
 	void GetViewMatrix(XMMATRIX&);
 

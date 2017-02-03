@@ -46,12 +46,7 @@ bool System::Initialize()
 
 
 	// Initialize the input object.
-	result = m_input.Initialize(m_hinstance, m_hwnd, screenWidth, screenHeight);
-	if (!result)
-	{
-		MessageBox(m_hwnd, L"Could not initialize the input object.", L"Error", MB_OK);
-		return false;
-	}
+	m_input.Initialize();
 
 	// Initialize the graphics object.
 	result = m_graphics.Initialize(screenWidth, screenHeight, m_hwnd);
@@ -94,33 +89,35 @@ void System::Run()
 			result = Frame();
 			if (!result)
 			{
-				MessageBox(m_hwnd, L"Frame Processing Failed", L"Error", MB_OK);
+				//MessageBox(m_hwnd, L"Frame Processing Failed", L"Error", MB_OK);
 				done = true;
 			}
 
 			// Check if the user pressed escape and wants to quit.
-			if (m_input.IsKeyPressed(DIK_ESCAPE) == true)
+			/*if (m_input.IsKeyPressed(DIK_ESCAPE) == true)
 			{
 				done = true;
-			}
+			}*/
 		}
 	}
 
-	return;
-}
-
-LRESULT System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
-{
-	return DefWindowProc(hwnd, umsg, wparam, lparam);
 }
 
 bool System::Frame()
 {
 	bool result;
 
-	// Do the input frame processing.
-	result = m_input.Frame();
-	if (!result)
+	m_input.Frame(m_hwnd);
+
+	//// Do the input frame processing.
+	//result = m_input.Frame();
+	//if (!result)
+	//{
+	//	return false;
+	//}
+
+	// Check if the user pressed escape and wants to exit the application.
+	if (m_input.IsKeyDown(VK_ESCAPE))
 	{
 		return false;
 	}
@@ -131,6 +128,9 @@ bool System::Frame()
 	{
 		return false;
 	}
+
+
+
 
 	return true;
 }
@@ -143,7 +143,7 @@ void System::InitializeWindows(int &screenWidth, int &screenHeight)
 
 
 	// Get an external pointer to this object.	
-	ApplicationHandle = this;
+	InputHandle = &(this->m_input);
 
 	// Get the instance of this application.
 	m_hinstance = GetModuleHandle(NULL);
@@ -213,6 +213,20 @@ void System::InitializeWindows(int &screenWidth, int &screenHeight)
 	// Hide the mouse cursor.
 	ShowCursor(false);
 
+	RECT rect;
+	POINT ptClientUL;
+	POINT ptClientLR;
+	GetClientRect(m_hwnd, &rect);
+	ptClientUL.x = rect.left;
+	ptClientUL.y = rect.top;
+	ptClientLR.x = rect.right;
+	ptClientLR.y = rect.bottom;
+	ClientToScreen(m_hwnd, &ptClientUL);
+	ClientToScreen(m_hwnd, &ptClientLR);
+	SetRect(&rect, ptClientUL.x, ptClientUL.y,
+		ptClientLR.x, ptClientLR.y);
+	ClipCursor(&rect);
+
 	return;
 }
 
@@ -236,32 +250,31 @@ void System::ShutdownWindows()
 	m_hinstance = NULL;
 
 	// Release the pointer to this class.
-	ApplicationHandle = NULL;
+	InputHandle = NULL;
 }
-
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
 	switch (umessage)
 	{
 		// Check if the window is being destroyed.
-		case WM_DESTROY:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
+	case WM_DESTROY:
+	{
+		PostQuitMessage(0);
+		return 0;
+	}
 
-		// Check if the window is being closed.
-		case WM_CLOSE:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
+	// Check if the window is being closed.
+	case WM_CLOSE:
+	{
+		PostQuitMessage(0);
+		return 0;
+	}
 
-		// All other messages pass to the message handler in the system class.
-		default:
-		{
-			return ApplicationHandle->MessageHandler(hwnd, umessage, wparam, lparam);
-		}
+	// All other messages pass to the message handler in the system class.
+	default:
+	{
+		return InputHandle->MessageHandler(hwnd, umessage, wparam, lparam);
+	}
 	}
 }

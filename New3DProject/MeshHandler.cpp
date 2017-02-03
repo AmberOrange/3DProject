@@ -59,7 +59,7 @@ bool MeshHandler::add(Mesh &mesh)
 bool MeshHandler::Initialize(ID3D11Device *device, HWND hwnd)
 {
 	this->add(Object("Cow.obj"));
-	this->add(Object("Crate.obj"));
+	//this->add(Object("Crate.obj"));
 
 	for (int i = 0; i < this->nrOfMeshes; i++)
 	{
