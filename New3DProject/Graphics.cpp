@@ -51,12 +51,12 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	return true;
 }
 
-bool Graphics::Frame(DInput &input)
+bool Graphics::Frame(DInput &input, double time)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
 
-	m_Camera.Frame(input);
+	m_Camera.Frame(input, time);
 	// Generate the view matrix based on the camera's position.
 	m_Camera.Render();
 

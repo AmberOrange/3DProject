@@ -19,16 +19,23 @@ public:
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
 
-	bool Frame(DInput &);
+	bool Frame(DInput &dinput, double time);
 	void Render();
 	void GetViewMatrix(XMMATRIX&);
 
 private:
 	//float m_positionX, m_positionY, m_positionZ;
 	//float m_rotationX, m_rotationY, m_rotationZ;
+
 	XMFLOAT3 m_position, m_rotation;
 	XMVECTOR m_up, m_look, m_right;
+	XMVECTOR camPosition;
 	XMMATRIX m_viewMatrix;
+	float moveLeftRight = 0.0f;
+	float moveBackForward = 0.0f;
+
+	float camYaw = 0.0f;
+	float camPitch = 0.0f;
 };
 
 #endif /* CAMERA_HPP */

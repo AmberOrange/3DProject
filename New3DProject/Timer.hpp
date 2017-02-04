@@ -23,6 +23,6 @@ private:
 
 	__int64 frameTimeOld;
 	double frameTime;
-}
+};
 
 #endif

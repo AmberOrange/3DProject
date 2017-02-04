@@ -6,6 +6,7 @@
 #include <Windows.h>
 
 //#include "Input.hpp"
+#include "Timer.hpp"
 #include "DInput.hpp"
 #include "Graphics.hpp"
 
@@ -26,6 +27,7 @@ private:
 	HWND m_hwnd;
 
 	//Input m_input;
+	Timer m_timer;
 	DInput m_input;
 	Graphics m_graphics;
 

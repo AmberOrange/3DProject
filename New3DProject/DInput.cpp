@@ -99,7 +99,7 @@ bool DInput::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int scr
 	}
 
 	// Set the cooperative level of the mouse to share with other programs.
-	result = m_mouse->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	result = m_mouse->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
 	if (FAILED(result))
 	{
 		return false;
@@ -171,6 +171,16 @@ void DInput::GetMouseMovement(int &mouseX, int &mouseY)
 	mouseY = m_mouseMoveY;
 }
 
+DIMOUSESTATE & DInput::GetMouseState()
+{
+	return m_mouseState;
+}
+
+bool DInput::MouseMoved()
+{
+	return m_mouseMoved;
+}
+
 bool DInput::ReadKeyboard()
 {
 	HRESULT result;
@@ -197,10 +207,10 @@ bool DInput::ReadKeyboard()
 bool DInput::ReadMouse()
 {
 	HRESULT result;
-
+	DIMOUSESTATE mouseCurrState;
 
 	// Read the mouse device.
-	result = m_mouse->GetDeviceState(sizeof(DIMOUSESTATE), (LPVOID)&m_mouseState);
+	result = m_mouse->GetDeviceState(sizeof(DIMOUSESTATE), (LPVOID)&mouseCurrState);
 	if (FAILED(result))
 	{
 		// If the mouse lost focus or was not acquired then try to get control back.
@@ -213,6 +223,13 @@ bool DInput::ReadMouse()
 			return false;
 		}
 	}
+	else if (mouseCurrState.lX != m_mouseState.lX || mouseCurrState.lY != m_mouseState.lY)
+	{
+		m_mouseMoved = true;
+		m_mouseState = mouseCurrState;
+	}
+	else
+		m_mouseMoved = false;
 
 	return true;
 }

@@ -72,6 +72,9 @@ void System::Run()
 	// Initialize the message structure.
 	ZeroMemory(&msg, sizeof(MSG));
 
+	//Start timer
+	m_timer.StartTimer();
+
 	// Loop until there is a quit message from the window or the user.
 	done = false;
 	while (!done)
@@ -126,7 +129,7 @@ bool System::Frame()
 	}
 
 	// Do the frame processing for the graphics object.
-	result = m_graphics.Frame(m_input);
+	result = m_graphics.Frame(m_input, m_timer.GetFrameTime());
 	if (!result)
 	{
 		return false;

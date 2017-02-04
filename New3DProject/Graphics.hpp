@@ -27,7 +27,7 @@ public:
 	~Graphics();
 
 	bool Initialize(int, int, HWND);
-	bool Frame(DInput &);
+	bool Frame(DInput &, double time);
 
 private:
 	bool Render();

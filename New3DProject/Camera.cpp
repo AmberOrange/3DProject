@@ -5,9 +5,11 @@ Camera::Camera()
 	m_position = XMFLOAT3(0.f, 0.f, 0.f);
 	m_rotation = XMFLOAT3(0.f, 0.f, 0.f);
 
-	m_right = XMLoadFloat3(&XMFLOAT3(1.f, 0.f, 0.f));
-	m_up = XMLoadFloat3(&XMFLOAT3(0.f, 1.f, 0.f));
-	m_look = XMLoadFloat3(&XMFLOAT3(0.f, 0.f, 1.f));
+	camPosition = XMVectorSet(0.f, 0.f, -5.f, 0.f);
+
+	m_right = XMVectorSet(1.f, 0.f, 0.f,0.f);
+	m_up = XMVectorSet(0.f, 1.f, 0.f,0.f);
+	m_look = XMVectorSet(0.f, 0.f, 1.f,0.f);
 }
 
 Camera::Camera(const Camera &other)
@@ -44,9 +46,9 @@ XMFLOAT3 Camera::GetRotation()
 	return m_rotation;
 }
 
-bool Camera::Frame(DInput &dinput)
+bool Camera::Frame(DInput &dinput, double time)
 {
-	XMVECTOR rightVector, lookVector;
+	/*XMVECTOR rightVector, lookVector;
 	XMFLOAT3 right, look;
 	XMMATRIX rotationMatrix;
 	float speed = 0.1f;
@@ -91,7 +93,38 @@ bool Camera::Frame(DInput &dinput)
 			m_position.x + right.x * speed,
 			m_position.y + right.y * speed,
 			m_position.z + right.z * speed
-		);
+		);*/
+
+
+	float speed = 15.0f * time;
+
+	if (dinput.IsKeyPressed(DIK_A))
+	{
+		moveLeftRight -= speed;
+	}
+	if (dinput.IsKeyPressed(DIK_D))
+	{
+		moveLeftRight += speed;
+	}
+	if (dinput.IsKeyPressed(DIK_W))
+	{
+		moveBackForward += speed;
+	}
+	if (dinput.IsKeyPressed(DIK_S))
+	{
+		moveBackForward -= speed;
+	}
+	if (dinput.MouseMoved())
+	{
+		camYaw += dinput.GetMouseState().lX * 0.001f;
+
+		camPitch += dinput.GetMouseState().lY * 0.001f;
+
+		if (camPitch > XM_PIDIV2 - 0.000001f)
+			camPitch = XM_PIDIV2 - 0.000001f;
+		else if (camPitch < -XM_PIDIV2 + 0.000001f)
+			camPitch = -XM_PIDIV2 + 0.000001f;
+	}
 
 	return true;
 }
@@ -99,27 +132,48 @@ bool Camera::Frame(DInput &dinput)
 // Could use an improvement tbh
 void Camera::Render()
 {
-	XMVECTOR upVector, positionVector, lookAtVector;
-	XMMATRIX rotationMatrix;
+	//XMVECTOR upVector, positionVector, lookAtVector;
+	//XMMATRIX rotationMatrix;
 
-	positionVector = XMLoadFloat3(&m_position);
+	//positionVector = XMLoadFloat3(&m_position);
 
-	// Create the rotation matrix from the yaw, pitch, and roll values.
-	rotationMatrix = XMMatrixRotationRollPitchYaw(
-		m_rotation.x * 0.0174532925f,
-		m_rotation.y * 0.0174532925f,
-		m_rotation.z * 0.0174532925f);
-		
+	//// Create the rotation matrix from the yaw, pitch, and roll values.
+	//rotationMatrix = XMMatrixRotationRollPitchYaw(
+	//	m_rotation.x * 0.0174532925f,
+	//	m_rotation.y * 0.0174532925f,
+	//	m_rotation.z * 0.0174532925f);
+	//	
 
-	// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-	lookAtVector = XMVector3TransformCoord(m_look, rotationMatrix);
-	upVector = XMVector3TransformCoord(m_up, rotationMatrix);
+	//// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
+	//lookAtVector = XMVector3TransformCoord(m_look, rotationMatrix);
+	//upVector = XMVector3TransformCoord(m_up, rotationMatrix);
 
-	// Translate the rotated camera position to the location of the viewer.
-	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
+	//// Translate the rotated camera position to the location of the viewer.
+	//lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
-	// Finally create the view matrix from the three updated vectors.
-	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+	//// Finally create the view matrix from the three updated vectors.
+	//m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+
+	XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
+	XMVECTOR camTarget = XMVector3TransformCoord(m_look, camRotationMatrix);
+	camTarget = XMVector3Normalize(camTarget);
+
+	XMMATRIX RotateYTempMatrix;
+	RotateYTempMatrix = XMMatrixRotationY(camYaw);
+
+	XMVECTOR camRight = XMVector3TransformCoord(m_right, RotateYTempMatrix);
+	XMVECTOR camUp = XMVector3TransformCoord(m_up, RotateYTempMatrix);
+	XMVECTOR camForward = XMVector3TransformCoord(m_look, RotateYTempMatrix);
+
+	camPosition += moveLeftRight*camRight;
+	camPosition += moveBackForward*camForward;
+
+	moveLeftRight = 0.0f;
+	moveBackForward = 0.0f;
+
+	camTarget = camPosition + camTarget;
+
+	m_viewMatrix = XMMatrixLookAtLH(camPosition, camTarget, camUp);
 
 }
 
