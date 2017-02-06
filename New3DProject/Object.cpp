@@ -1,6 +1,6 @@
 #include "Object.hpp"
 
-Object::Object()
+Object::Object() : Mesh()
 {
 
 }
@@ -51,7 +51,8 @@ bool Object::loadFromFile(string fileName)
 	nrOfTC = 0;
 	nrOfNor = 0;
 	nrOfFaces = 0;
-	hasNormals = true;
+	hasNormals = false;
+	this->hasTexcoords = false;
 
 	if (fileIn.is_open())
 	{
@@ -73,6 +74,16 @@ bool Object::loadFromFile(string fileName)
 					nrOfPos++;
 				}
 
+				else if (line[1] == 'n') // Normal.
+				{
+					hasNormals = true;
+
+					tempNor = getAsVec3(line);
+
+					vNor.push_back(tempNor);
+					nrOfNor++;
+				}
+
 				else if (line[1] == 't') // Texture coordinate.
 				{
 					this->hasTexcoords = true;
@@ -84,15 +95,6 @@ bool Object::loadFromFile(string fileName)
 
 				}
 
-				else if (line[1] == 'n') // Normal.
-				{
-					hasNormals = true;
-
-					tempNor = getAsVec3(line);
-
-					vNor.push_back(tempNor);
-					nrOfNor++;
-				}
 
 				break;
 
@@ -102,10 +104,40 @@ bool Object::loadFromFile(string fileName)
 				{
 					tempFace = getAsFace(line);
 
+					/* -- OLD -- /
+
 					// Face defined as quad instead of triangle.
 					if (tempFace.indPos[3] != 0)
 						this->faceDefAsTriangles = false;
 
+					// --    -- */
+
+					// Push back will follow pattern:
+					// 012 023 034 045 ...
+					for (int i = 1; i < tempFace.nrOfIndices - 1; i++)
+					{
+						indPos.push_back(tempFace.indPos[0]);
+						indPos.push_back(tempFace.indPos[i]);
+						indPos.push_back(tempFace.indPos[i + 1]);
+
+						if (hasNormals)
+						{
+							indNor.push_back(tempFace.indNor[0]);
+							indNor.push_back(tempFace.indNor[i]);
+							indNor.push_back(tempFace.indNor[i + 1]);
+						}
+
+						if (this->hasTexcoords)
+						{
+							indTC.push_back(tempFace.indTC[0]);
+							indTC.push_back(tempFace.indTC[i]);
+							indTC.push_back(tempFace.indTC[i + 1]);
+						}
+
+						this->nrOfVertices++;
+					}
+
+					/* -- OLD -- //
 					for (int i = 0; i < 3; i++)
 					{
 						indPos.push_back(tempFace.indPos[i]);
@@ -131,7 +163,7 @@ bool Object::loadFromFile(string fileName)
 
 						this->nrOfVertices += 3;
 					}
-
+					// --    -- */
 					nrOfFaces++;
 				}
 
@@ -163,18 +195,11 @@ bool Object::loadFromFile(string fileName)
 	// Compute Normals if not stored in obj file.
 	if (!hasNormals)
 	{
-		int jump;
-
-		//if (faceDefAsTriangles)
-			jump = 3;
-		//else // Quad
-		//	jump = 4;
-
-		for (int i = 0; i < this->nrOfVertices; i += jump)
+		for (int i = 0; i < this->nrOfVertices; i += 3)
 		{
 			tempNor = getNormal(this->vertices[i].Position, this->vertices[i + 1].Position, this->vertices[i + 2].Position);
 
-			for (int j = i; j < i + jump; j++)
+			for (int j = i; j < i + 3; j++)
 			{
 				this->vertices[j].Normal = tempNor;
 				nrOfNor++;
@@ -243,6 +268,7 @@ Face Object::getAsFace(string line)
 {
 	stringstream strToInt, ss(line);
 
+	int index;
 	int whichPart;		// Current values is the index of Position, Texcoord or Normal.
 	string subSS;		// Extract one of three/four vertices at a time from the line.
 	string vertPart;	// Used to get current values for the parts of current vertex.
@@ -279,13 +305,14 @@ Face Object::getAsFace(string line)
 					{
 						strToInt.clear();
 						strToInt << vertPart;
+						strToInt >> index;
 
 						if (whichPart == 0)
-							strToInt >> returnFace.indPos[returnFace.nrOfIndices];
+							returnFace.indPos.push_back(index);
 						else if (whichPart == 1)
-							strToInt >> returnFace.indTC[returnFace.nrOfIndices];
+							returnFace.indTC.push_back(index);
 						else if (whichPart == 2)
-							strToInt >> returnFace.indNor[returnFace.nrOfIndices];
+							returnFace.indNor.push_back(index);
 
 						whichPart++;
 						vertPart = "";
