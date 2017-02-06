@@ -5,8 +5,14 @@
 
 #include <Windows.h>
 
+<<<<<<< HEAD
 #include "Input.hpp"
 //#include "DInput.hpp"
+=======
+//#include "Input.hpp"
+#include "Timer.hpp"
+#include "DInput.hpp"
+>>>>>>> bdd00f26f199416230860948fb6269d14c9ea122
 #include "Graphics.hpp"
 
 class System
@@ -23,7 +29,13 @@ private:
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
 
+<<<<<<< HEAD
 	Input m_input;
+=======
+	//Input m_input;
+	Timer m_timer;
+	DInput m_input;
+>>>>>>> bdd00f26f199416230860948fb6269d14c9ea122
 	Graphics m_graphics;
 
 	bool Frame();

@@ -106,16 +106,6 @@ bool Object::loadFromFile(string fileName)
 					if (tempFace.indPos[3] != 0)
 						this->faceDefAsTriangles = false;
 
-					//// Face may store 4 values per Pos/TC/Nor.
-					//// If the 4th is not used, it will have the
-					//// value 0 by default.
-					//for (int i = 0; i < 4; i++)
-					//{
-					//	indPos.push_back(tempFace.indPos[i]);
-					//	indTC.push_back(tempFace.indTC[i]);
-					//	indNor.push_back(tempFace.indNor[i]);
-					//}
-
 					for (int i = 0; i < 3; i++)
 					{
 						indPos.push_back(tempFace.indPos[i]);
@@ -127,18 +117,6 @@ bool Object::loadFromFile(string fileName)
 
 					if (!this->faceDefAsTriangles)
 					{
-						/*indPos.push_back(tempFace.indPos[0]);
-						indPos.push_back(tempFace.indPos[2]);
-						indPos.push_back(tempFace.indPos[3]);
-
-						indTC.push_back(tempFace.indTC[0]);
-						indTC.push_back(tempFace.indTC[2]);
-						indTC.push_back(tempFace.indTC[3]);
-
-						indNor.push_back(tempFace.indNor[0]);
-						indNor.push_back(tempFace.indNor[2]);
-						indNor.push_back(tempFace.indNor[3]);*/
-
 						indPos.push_back(tempFace.indPos[2]);
 						indPos.push_back(tempFace.indPos[3]);
 						indPos.push_back(tempFace.indPos[0]);
@@ -153,12 +131,6 @@ bool Object::loadFromFile(string fileName)
 
 						this->nrOfVertices += 3;
 					}
-
-
-					/*if (this->faceDefAsTriangles)
-						this->nrOfVertices += 3;
-					else
-						this->nrOfVertices += 4;*/
 
 					nrOfFaces++;
 				}
@@ -209,58 +181,6 @@ bool Object::loadFromFile(string fileName)
 			}
 		}
 	}
-
-	//// Expand array
-	//if (!faceDefAsTriangles)
-	//{
-	//	int newSize;
-	//	int sampler;
-
-	//	int face;
-	//	int vert;
-
-	//	Vertex *newVertices;
-
-	//	// If faces store quads, two more
-	//	// vertices will be added per face.
-	//	newSize = this->nrOfVertices + 2 * nrOfFaces;
-	//	sampler = 0;
-
-	//	face = 1;
-	//	vert = 1;
-
-	//	newVertices = new Vertex[newSize];
-
-	//	// Fill new vertex array.
-	//	for (int i = 0; i < newSize; i++)
-	//	{
-	//		newVertices[i] = this->vertices[sampler];
-
-	//		if (face == 1 && vert == 3)
-	//		{
-	//			face++;
-	//			vert = 1;
-	//		}
-	//		else if (face == 2 && vert == 1)
-	//			sampler--;
-	//		else
-	//			sampler++;
-
-	//		// Reset
-	//		if (face == 2 && vert == 3)
-	//		{
-	//			face = 1;
-	//			vert = 0;
-	//		}
-
-	//		vert++;
-	//	}
-
-	//	// Switch to new array and delete old.
-	//	delete[]this->vertices;
-	//	this->vertices = newVertices;
-	//	newVertices = nullptr;
-	//}
 }
 
 Mesh *Object::Clone()
@@ -324,13 +244,12 @@ Face Object::getAsFace(string line)
 	stringstream strToInt, ss(line);
 
 	int whichPart;		// Current values is the index of Position, Texcoord or Normal.
-	int vertCount;		// Current vertex. 
 	string subSS;		// Extract one of three/four vertices at a time from the line.
 	string vertPart;	// Used to get current values for the parts of current vertex.
 	char pop1, pop2;	// Pop char.
 	Face returnFace;
 
-	vertCount = 0;
+	returnFace.nrOfIndices = 0;
 	subSS = "";
 
 	if (ss)
@@ -362,18 +281,18 @@ Face Object::getAsFace(string line)
 						strToInt << vertPart;
 
 						if (whichPart == 0)
-							strToInt >> returnFace.indPos[vertCount];
+							strToInt >> returnFace.indPos[returnFace.nrOfIndices];
 						else if (whichPart == 1)
-							strToInt >> returnFace.indTC[vertCount];
+							strToInt >> returnFace.indTC[returnFace.nrOfIndices];
 						else if (whichPart == 2)
-							strToInt >> returnFace.indNor[vertCount];
+							strToInt >> returnFace.indNor[returnFace.nrOfIndices];
 
 						whichPart++;
 						vertPart = "";
 					}
 				} // end for
 
-				vertCount++;
+				returnFace.nrOfIndices++; // Check if right place.
 
 				subSS = "";
 				ss >> subSS;

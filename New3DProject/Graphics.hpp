@@ -28,8 +28,12 @@ public:
 	~Graphics();
 
 	bool Initialize(int, int, HWND);
+<<<<<<< HEAD
 	//bool Frame(DInput &);
 	bool Frame(Input &);
+=======
+	bool Frame(DInput &, double time);
+>>>>>>> bdd00f26f199416230860948fb6269d14c9ea122
 
 private:
 	bool Render();

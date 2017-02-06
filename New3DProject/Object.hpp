@@ -3,9 +3,11 @@
 
 struct Face
 {
-	int indPos[4] = { 0 };
-	int indTC[4] = { 0 };
-	int indNor[4] = { 0 };
+	int nrOfIndices;
+
+	vector<int> indPos;
+	vector<int> indTC;
+	vector<int> indNor;
 };
 
 class Object : public Mesh

@@ -38,7 +38,7 @@ protected:
 
 	bool RHCoordSys;
 	bool hasTexcoords;
+
+	// -- OLD -- //
 	bool faceDefAsTriangles;
-
-
 };

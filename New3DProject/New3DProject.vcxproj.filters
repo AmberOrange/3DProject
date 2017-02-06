@@ -63,8 +63,13 @@
     <ClCompile Include="Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="WICTextureLoader.cpp">
       <Filter>Source Files\Helper</Filter>
+=======
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files</Filter>
+>>>>>>> bdd00f26f199416230860948fb6269d14c9ea122
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +120,9 @@
     </ClInclude>
     <ClInclude Include="PlatformHelpers.h">
       <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -23,6 +23,8 @@ public:
 	bool IsKeyPressed(unsigned int key);
 	void GetMouseLocation(int&, int&);
 	void GetMouseMovement(int&, int&);
+	DIMOUSESTATE& GetMouseState();
+	bool MouseMoved();
 
 private:
 	IDirectInput8* m_directInput;
@@ -32,6 +34,7 @@ private:
 	unsigned char m_keyboardState[256];
 	DIMOUSESTATE m_mouseState;
 
+	bool m_mouseMoved;
 	int m_screenWidth, m_screenHeight;
 	int m_mouseX, m_mouseY;
 	int m_mouseMoveX, m_mouseMoveY;
